@@ -83,6 +83,7 @@ class UserResponse(BaseModel):
     subscription_expires: Optional[str] = None
     checks_used_this_month: int
     checks_remaining: int
+    onboarding_completed: bool = False
     created_at: str
 
 class TokenResponse(BaseModel):
@@ -173,6 +174,7 @@ def get_user_response(user: dict) -> UserResponse:
         subscription_expires=user.get("subscription_expires"),
         checks_used_this_month=user.get("checks_used_this_month", 0),
         checks_remaining=checks_remaining,
+        onboarding_completed=user.get("onboarding_completed", False),
         created_at=user.get("created_at", "")
     )
 
