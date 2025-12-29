@@ -13,6 +13,8 @@ import PricingPage from "./pages/PricingPage";
 import AccountPage from "./pages/AccountPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import HistoryPage from "./pages/HistoryPage";
+import ShoppersPage from "./pages/ShoppersPage";
+import SellersPage from "./pages/SellersPage";
 import "./App.css";
 
 // Protected Route Component
@@ -75,6 +77,8 @@ function AppRouter() {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+      <Route path="/shoppers" element={<ShoppersPage />} />
+      <Route path="/sellers" element={<SellersPage />} />
       <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
       <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
