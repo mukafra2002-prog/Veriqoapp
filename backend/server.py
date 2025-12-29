@@ -373,7 +373,7 @@ async def verify_phone_otp(data: PhoneVerifyRequest):
 
 # Forgot Password - Request Reset
 @api_router.post("/auth/forgot-password")
-async def forgot_password(data: ForgotPasswordRequest):
+async def forgot_password(data: ForgotPasswordRequest, request: Request):
     user = await db.users.find_one({"email": data.email}, {"_id": 0})
     
     # Always return success to prevent email enumeration
@@ -395,16 +395,39 @@ async def forgot_password(data: ForgotPasswordRequest):
         upsert=True
     )
     
-    # Send email
+    # Get frontend URL from referer or use default
+    referer = request.headers.get("referer", "")
+    if referer:
+        from urllib.parse import urlparse
+        parsed = urlparse(referer)
+        frontend_url = f"{parsed.scheme}://{parsed.netloc}"
+    else:
+        frontend_url = os.environ.get("FRONTEND_URL", "https://veriqo.app")
+    
+    # Send email if Resend is configured
     if resend.api_key:
         try:
-            reset_link = f"https://veriqo.app/reset-password?token={reset_token}"
+            reset_link = f"{frontend_url}/reset-password?token={reset_token}"
             html_content = f"""
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #2563eb;">Reset Your Password</h2>
-                <p>You requested to reset your Veriqo password. Click the button below to create a new password:</p>
-                <a href="{reset_link}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin: 20px 0;">Reset Password</a>
-                <p style="color: #666; font-size: 14px;">This link expires in 1 hour. If you didn't request this, please ignore this email.</p>
+            <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #0f172a;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #fff; font-size: 28px; margin: 0;">⚡ Veriqo</h1>
+                </div>
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid #334155; border-radius: 16px; padding: 32px;">
+                    <h2 style="color: #fff; font-size: 24px; margin: 0 0 16px 0;">Reset Your Password</h2>
+                    <p style="color: #94a3b8; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
+                        You requested to reset your Veriqo password. Click the button below to create a new password:
+                    </p>
+                    <a href="{reset_link}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px;">
+                        Reset Password
+                    </a>
+                    <p style="color: #64748b; font-size: 14px; margin: 24px 0 0 0;">
+                        This link expires in 1 hour. If you didn't request this, please ignore this email.
+                    </p>
+                </div>
+                <p style="color: #475569; font-size: 12px; text-align: center; margin-top: 24px;">
+                    © 2024 Veriqo. Verify before you buy.
+                </p>
             </div>
             """
             
@@ -415,8 +438,13 @@ async def forgot_password(data: ForgotPasswordRequest):
                 "html": html_content
             }
             await asyncio.to_thread(resend.Emails.send, params)
+            logging.info(f"Password reset email sent to {data.email}")
         except Exception as e:
             logging.error(f"Email send error: {e}")
+    else:
+        logging.warning("Resend API key not configured - password reset email not sent")
+        # Store the reset link in the response for development
+        logging.info(f"Reset link (dev): {frontend_url}/reset-password?token={reset_token}")
     
     return {"message": "If an account exists, a reset link has been sent"}
 
