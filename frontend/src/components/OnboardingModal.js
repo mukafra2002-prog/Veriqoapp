@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
-import { Dialog, DialogContent } from './ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from './ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Link2, CheckCircle, Crown, ArrowRight, X } from 'lucide-react';
 
 const steps = [
@@ -50,6 +51,10 @@ export const OnboardingModal = ({ open, onClose }) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md p-0 overflow-hidden" data-testid="onboarding-modal">
+        <VisuallyHidden>
+          <DialogTitle>Welcome to Veriqo</DialogTitle>
+          <DialogDescription>Learn how to use Veriqo to analyze Amazon products</DialogDescription>
+        </VisuallyHidden>
         <div className="relative">
           {/* Skip Button */}
           <button
