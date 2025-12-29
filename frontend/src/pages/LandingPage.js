@@ -1,29 +1,46 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Zap, Shield, Clock, ArrowRight, CheckCircle, Star } from 'lucide-react';
+import { 
+  Zap, Shield, Clock, ArrowRight, CheckCircle, Star, 
+  Sparkles, TrendingUp, Users, Play, ChevronRight,
+  ShoppingBag, BadgeCheck, AlertTriangle
+} from 'lucide-react';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-50" data-testid="landing-page">
+    <div className="min-h-screen bg-slate-950 text-white overflow-hidden" data-testid="landing-page">
+      {/* Animated Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-blue-600/10 to-emerald-600/10 rounded-full blur-3xl"></div>
+      </div>
+
       {/* Navigation */}
-      <nav className="nav-glass fixed top-0 left-0 right-0 z-50">
+      <nav className="relative z-50 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-slate-900">Veriqo</span>
-            </div>
+          <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Veriqo</span>
+            </div>
+            <div className="hidden md:flex items-center gap-8">
+              <a href="#features" className="text-slate-400 hover:text-white transition-colors">Features</a>
+              <a href="#how-it-works" className="text-slate-400 hover:text-white transition-colors">How it Works</a>
+              <a href="#pricing" className="text-slate-400 hover:text-white transition-colors">Pricing</a>
+            </div>
+            <div className="flex items-center gap-4">
               <Link to="/login">
-                <Button variant="ghost" className="font-medium" data-testid="login-btn">
+                <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-white/10" data-testid="login-btn">
                   Log in
                 </Button>
               </Link>
               <Link to="/register">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6" data-testid="signup-btn">
-                  Sign up free
+                <Button className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white rounded-full px-6 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all hover:scale-105" data-testid="signup-btn">
+                  Start Free
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
@@ -32,87 +49,204 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium mb-6 animate-fade-in">
-            <Shield className="w-4 h-4" />
-            Trusted by 10,000+ smart shoppers
+      <section className="relative pt-20 pb-32 px-4">
+        <div className="max-w-5xl mx-auto text-center">
+          {/* Trust Badge */}
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border border-blue-500/20 rounded-full text-sm mb-8 animate-fade-in">
+            <Sparkles className="w-4 h-4 text-blue-400" />
+            <span className="text-slate-300">Trusted by <span className="text-white font-semibold">50,000+</span> smart shoppers</span>
+            <div className="flex -space-x-2">
+              {[1,2,3,4].map(i => (
+                <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 border-2 border-slate-900"></div>
+              ))}
+            </div>
           </div>
           
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 animate-slide-up">
-            Verify before you buy.
+          {/* Main Headline */}
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 animate-slide-up">
+            <span className="bg-gradient-to-r from-white via-white to-slate-400 bg-clip-text text-transparent">
+              Verify before
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-blue-400 via-emerald-400 to-blue-400 bg-clip-text text-transparent animate-gradient">
+              you buy.
+            </span>
           </h1>
           
-          <p className="text-lg sm:text-xl text-slate-600 mb-10 max-w-2xl mx-auto animate-slide-up stagger-1">
-            Paste any Amazon link. Get instant AI-powered review analysis with a clear 
-            <span className="text-emerald-600 font-semibold"> Buy</span> / 
-            <span className="text-amber-600 font-semibold"> Think</span> / 
-            <span className="text-red-600 font-semibold"> Avoid</span> verdict.
+          {/* Subheadline */}
+          <p className="text-xl sm:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed animate-slide-up stagger-1">
+            Paste any Amazon link. Get instant AI analysis with a clear
+            <span className="inline-flex items-center mx-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-lg font-semibold">
+              <CheckCircle className="w-4 h-4 mr-1.5" /> Buy
+            </span>
+            <span className="inline-flex items-center mx-2 px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full text-lg font-semibold">
+              <AlertTriangle className="w-4 h-4 mr-1.5" /> Think
+            </span>
+            <span className="inline-flex items-center mx-2 px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-lg font-semibold">
+              <Shield className="w-4 h-4 mr-1.5" /> Avoid
+            </span>
+            verdict.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up stagger-2">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8 animate-slide-up stagger-2">
             <Link to="/register">
               <Button 
-                className="h-14 px-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all hover:scale-[1.02]"
+                className="h-16 px-10 rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold text-lg shadow-2xl shadow-blue-500/25 hover:shadow-emerald-500/25 transition-all hover:scale-105 group"
                 data-testid="hero-cta"
               >
+                <Zap className="w-5 h-5 mr-2 group-hover:animate-pulse" />
                 Start Free Analysis
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
             <Button 
               variant="outline" 
-              className="h-14 px-8 rounded-full border-slate-200 text-slate-700 font-semibold text-lg hover:bg-slate-50"
+              className="h-16 px-10 rounded-2xl border-2 border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold text-lg backdrop-blur-sm"
             >
-              See How It Works
+              <Play className="w-5 h-5 mr-2" />
+              Watch Demo
             </Button>
           </div>
 
-          <p className="text-sm text-slate-500 mt-4 animate-fade-in stagger-3">
-            3 free checks per month • No credit card required
+          <p className="text-slate-500 text-sm animate-fade-in stagger-3">
+            3 free checks per month • No credit card required • 10-second results
           </p>
+        </div>
+
+        {/* Hero Visual - Mock Results Card */}
+        <div className="max-w-4xl mx-auto mt-20 animate-slide-up stagger-4">
+          <div className="relative">
+            {/* Glow Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-emerald-600/20 blur-3xl"></div>
+            
+            {/* Card */}
+            <div className="relative bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                {/* Score */}
+                <div className="flex flex-col items-center">
+                  <div className="relative w-40 h-40">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-slate-700" strokeWidth="8"/>
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="url(#scoreGradient)" strokeWidth="8" strokeLinecap="round" strokeDasharray="264" strokeDashoffset="53"/>
+                      <defs>
+                        <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#10B981"/>
+                          <stop offset="100%" stopColor="#3B82F6"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-5xl font-bold text-white">87</span>
+                      <span className="text-sm text-slate-400">Score</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full">
+                    <span className="text-emerald-400 font-bold uppercase tracking-wider">BUY</span>
+                  </div>
+                </div>
+
+                {/* Details */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <BadgeCheck className="w-5 h-5 text-blue-400" />
+                    <span className="text-sm text-slate-400">Verified by AI • Updated 2 min ago</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-4">Sony WH-1000XM5 Wireless Headphones</h3>
+                  <p className="text-slate-400 mb-6">Exceptional noise cancellation and sound quality. Minor complaints about comfort during extended use and premium pricing.</p>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                      <span className="text-slate-300">Build Quality Concerns</span>
+                      <span className="text-slate-500 text-sm">12% of reviews</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                      <span className="text-slate-300">Comfort Issues</span>
+                      <span className="text-slate-500 text-sm">8% of reviews</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="relative py-20 border-y border-white/5">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { value: '50K+', label: 'Active Users', icon: Users },
+              { value: '1M+', label: 'Products Analyzed', icon: ShoppingBag },
+              { value: '4.9', label: 'User Rating', icon: Star },
+              { value: '<10s', label: 'Analysis Time', icon: Clock }
+            ].map((stat, idx) => (
+              <div key={idx} className="text-center">
+                <stat.icon className="w-8 h-8 text-blue-400 mx-auto mb-3" />
+                <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-slate-500">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-4 bg-white">
+      <section id="how-it-works" className="relative py-24 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-slate-900 mb-4">
-            Make confident purchases in seconds
-          </h2>
-          <p className="text-slate-600 text-center mb-16 max-w-2xl mx-auto">
-            Our AI analyzes thousands of real reviews to give you actionable insights
-          </p>
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm mb-4">
+              <TrendingUp className="w-4 h-4" />
+              Simple Process
+            </span>
+            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+              Shop smarter in 3 steps
+            </h2>
+            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+              Our AI analyzes thousands of reviews to give you actionable insights in seconds
+            </p>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 step: '01',
-                title: 'Paste Amazon Link',
+                title: 'Paste Link',
                 description: 'Copy any Amazon product URL and paste it into Veriqo',
-                icon: '🔗'
+                icon: '🔗',
+                gradient: 'from-blue-600 to-cyan-600'
               },
               {
                 step: '02',
-                title: 'AI Analyzes Reviews',
-                description: 'Our AI reads and understands verified customer feedback',
-                icon: '🤖'
+                title: 'AI Analyzes',
+                description: 'Our AI reads and understands verified customer reviews',
+                icon: '🤖',
+                gradient: 'from-purple-600 to-pink-600'
               },
               {
                 step: '03',
-                title: 'Get Clear Verdict',
-                description: 'Receive Buy/Think/Avoid score with top complaints highlighted',
-                icon: '✅'
+                title: 'Get Verdict',
+                description: 'Receive Buy/Think/Avoid score with key complaints highlighted',
+                icon: '✅',
+                gradient: 'from-emerald-600 to-teal-600'
               }
             ].map((item, idx) => (
-              <div 
-                key={idx} 
-                className="relative p-8 rounded-2xl border border-slate-100 hover:border-blue-100 hover:shadow-lg transition-all"
-              >
-                <span className="text-5xl mb-4 block">{item.icon}</span>
-                <span className="text-sm font-mono text-blue-600 mb-2 block">{item.step}</span>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-slate-600">{item.description}</p>
+              <div key={idx} className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-xl" style={{background: `linear-gradient(to bottom right, var(--tw-gradient-stops))`}}></div>
+                <div className="relative p-8 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur border border-white/5 rounded-3xl hover:border-white/10 transition-all group-hover:translate-y-[-4px]">
+                  <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-lg`}>
+                    {item.icon}
+                  </div>
+                  <span className="text-sm font-mono text-slate-500 mb-2 block">{item.step}</span>
+                  <h3 className="text-2xl font-bold text-white mb-3">{item.title}</h3>
+                  <p className="text-slate-400">{item.description}</p>
+                </div>
+                {idx < 2 && (
+                  <ChevronRight className="hidden md:block absolute top-1/2 -right-6 w-8 h-8 text-slate-700" />
+                )}
               </div>
             ))}
           </div>
@@ -120,91 +254,178 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="py-20 px-4">
+      <section id="features" className="relative py-24 px-4 bg-gradient-to-b from-transparent via-blue-950/20 to-transparent">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-6">
-                Why shoppers trust Veriqo
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-sm mb-4">
+                <Shield className="w-4 h-4" />
+                Why Veriqo
+              </span>
+              <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+                Trust signals that matter
               </h2>
               <div className="space-y-6">
                 {[
-                  { icon: CheckCircle, title: 'Real Review Analysis', desc: 'We analyze verified purchase reviews, not fake ones' },
-                  { icon: Clock, title: 'Instant Results', desc: 'Get your verdict in under 10 seconds' },
-                  { icon: Shield, title: 'Unbiased Insights', desc: 'No sponsorships, just honest AI-powered analysis' },
-                  { icon: Star, title: 'Top Complaints Highlighted', desc: 'Know exactly what real buyers complain about' }
+                  { icon: CheckCircle, title: 'Real Review Analysis', desc: 'We analyze verified purchase reviews, filtering out fake ones' },
+                  { icon: Clock, title: 'Instant Results', desc: 'Get your verdict in under 10 seconds, not minutes' },
+                  { icon: Shield, title: 'Unbiased Insights', desc: 'No sponsorships or affiliate bias—just honest AI analysis' },
+                  { icon: Star, title: 'Top Complaints', desc: 'Know exactly what real buyers complain about most' }
                 ].map((feature, idx) => (
-                  <div key={idx} className="flex gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      <feature.icon className="w-5 h-5 text-blue-600" />
+                  <div key={idx} className="flex gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors group">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-emerald-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                      <feature.icon className="w-6 h-6 text-blue-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900">{feature.title}</h3>
-                      <p className="text-slate-600 text-sm">{feature.desc}</p>
+                      <h3 className="font-semibold text-white mb-1">{feature.title}</h3>
+                      <p className="text-slate-400 text-sm">{feature.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="bg-gradient-to-br from-blue-50 to-emerald-50 rounded-3xl p-8 relative overflow-hidden">
-              <div className="bg-white rounded-2xl shadow-xl p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                    <CheckCircle className="w-6 h-6 text-emerald-600" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-emerald-600">87</div>
-                    <div className="text-sm text-slate-500">Confidence Score</div>
-                  </div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-emerald-600/30 blur-3xl"></div>
+              <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 rounded-3xl p-8 shadow-2xl">
+                <div className="space-y-4">
+                  {['Durability concerns after 6 months', 'Battery life shorter than advertised', 'Customer support response times'].map((complaint, idx) => (
+                    <div key={idx} className="flex items-center gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+                      <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                      <span className="text-slate-300">{complaint}</span>
+                      <span className="ml-auto text-red-400 text-sm">{23 - idx * 5}%</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium mb-4">
-                  <CheckCircle className="w-4 h-4" />
-                  BUY
+                <div className="mt-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users className="w-5 h-5 text-amber-400" />
+                    <span className="text-amber-400 font-semibold">Who Should NOT Buy</span>
+                  </div>
+                  <ul className="text-slate-400 text-sm space-y-1">
+                    <li>• Heavy daily users expecting 3+ year lifespan</li>
+                    <li>• Users without patience for support tickets</li>
+                  </ul>
                 </div>
-                <p className="text-slate-600 text-sm">
-                  "Highly rated for durability and value. Minor complaints about packaging."
-                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 px-4 bg-slate-900">
+      {/* Pricing Preview */}
+      <section id="pricing" className="relative py-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-            Ready to shop smarter?
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm mb-4">
+            <Star className="w-4 h-4" />
+            Simple Pricing
+          </span>
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+            Start free, upgrade when ready
           </h2>
-          <p className="text-slate-400 text-lg mb-8">
-            Join thousands of shoppers making confident purchase decisions with Veriqo.
+          <p className="text-xl text-slate-400 mb-12">
+            3 free analyses per month. Go premium for unlimited access.
           </p>
-          <Link to="/register">
-            <Button 
-              className="h-14 px-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg"
-              data-testid="footer-cta"
-            >
-              Get Started Free
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+            <div className="p-8 bg-slate-800/50 border border-white/5 rounded-3xl text-left">
+              <h3 className="text-xl font-bold text-white mb-2">Free</h3>
+              <div className="text-4xl font-bold text-white mb-6">$0<span className="text-lg text-slate-500">/mo</span></div>
+              <ul className="space-y-3 mb-8">
+                {['3 analyses per month', 'AI-powered insights', 'Top complaints view'].map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-2 text-slate-400">
+                    <CheckCircle className="w-5 h-5 text-emerald-400" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <Link to="/register">
+                <Button variant="outline" className="w-full h-12 rounded-xl border-white/10 text-white hover:bg-white/5">
+                  Get Started
+                </Button>
+              </Link>
+            </div>
+            <div className="relative p-8 bg-gradient-to-br from-blue-600/20 to-emerald-600/20 border border-blue-500/30 rounded-3xl text-left">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-full text-white text-sm font-semibold">
+                Most Popular
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Premium</h3>
+              <div className="text-4xl font-bold text-white mb-6">$6.99<span className="text-lg text-slate-400">/mo</span></div>
+              <ul className="space-y-3 mb-8">
+                {['Unlimited analyses', 'Priority AI processing', 'Save & compare products', 'Email support'].map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle className="w-5 h-5 text-emerald-400" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <Link to="/register">
+                <Button className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold">
+                  Start Free Trial
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative py-24 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative overflow-hidden rounded-3xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-emerald-600"></div>
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
+            <div className="relative px-8 py-16 text-center">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                Ready to shop smarter?
+              </h2>
+              <p className="text-xl text-white/80 mb-8 max-w-xl mx-auto">
+                Join 50,000+ shoppers making confident purchase decisions with Veriqo.
+              </p>
+              <Link to="/register">
+                <Button 
+                  className="h-14 px-10 rounded-2xl bg-white text-slate-900 hover:bg-slate-100 font-semibold text-lg shadow-xl hover:shadow-2xl transition-all hover:scale-105"
+                  data-testid="footer-cta"
+                >
+                  Get Started Free
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 bg-slate-50 border-t border-slate-200">
+      <footer className="relative py-12 px-4 border-t border-white/5">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Zap className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
             </div>
-            <span className="font-semibold text-slate-700">Veriqo</span>
+            <span className="font-semibold text-white">Veriqo</span>
           </div>
-          <p className="text-sm text-slate-500">
+          <p className="text-slate-500 text-sm">
             © 2024 Veriqo. Verify before you buy.
           </p>
+          <div className="flex items-center gap-6">
+            <a href="#" className="text-slate-500 hover:text-white transition-colors text-sm">Privacy</a>
+            <a href="#" className="text-slate-500 hover:text-white transition-colors text-sm">Terms</a>
+            <a href="#" className="text-slate-500 hover:text-white transition-colors text-sm">Contact</a>
+          </div>
         </div>
       </footer>
+
+      {/* CSS for animations */}
+      <style>{`
+        @keyframes gradient {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        .animate-gradient {
+          background-size: 200% 200%;
+          animation: gradient 3s ease infinite;
+        }
+      `}</style>
     </div>
   );
 }
