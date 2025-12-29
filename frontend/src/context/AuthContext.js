@@ -51,10 +51,38 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
+  const processGoogleAuth = async (sessionId) => {
+    const response = await axios.post(`${API_URL}/auth/google/session`, { session_id: sessionId });
+    const { token: newToken, user: userData } = response.data;
+    localStorage.setItem('veriqo_token', newToken);
+    setToken(newToken);
+    setUser(userData);
+    return userData;
+  };
+
+  const sendPhoneOTP = async (phoneNumber) => {
+    const response = await axios.post(`${API_URL}/auth/phone/send-otp`, { phone_number: phoneNumber });
+    return response.data;
+  };
+
+  const loginWithPhone = async (phoneNumber, code) => {
+    const response = await axios.post(`${API_URL}/auth/phone/verify-otp`, { 
+      phone_number: phoneNumber, 
+      code 
+    });
+    const { token: newToken, user: userData } = response.data;
+    localStorage.setItem('veriqo_token', newToken);
+    setToken(newToken);
+    setUser(userData);
+    return userData;
+  };
+
   const logout = () => {
     localStorage.removeItem('veriqo_token');
     setToken(null);
     setUser(null);
+    // Also call backend logout to clear cookie
+    axios.post(`${API_URL}/auth/logout`).catch(() => {});
   };
 
   const refreshUser = async () => {
@@ -81,6 +109,9 @@ export const AuthProvider = ({ children }) => {
       loading,
       login,
       register,
+      processGoogleAuth,
+      sendPhoneOTP,
+      loginWithPhone,
       logout,
       refreshUser,
       completeOnboarding
