@@ -16,7 +16,7 @@ import "./App.css";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, token } = useAuth();
   const location = useLocation();
   
   // If user data passed from AuthCallback, use it
@@ -32,8 +32,18 @@ const ProtectedRoute = ({ children }) => {
     );
   }
   
-  if (!user) {
+  // Also check for token - user might be loading
+  if (!user && !token) {
     return <Navigate to="/login" replace />;
+  }
+  
+  // If we have token but user is still loading, show loading
+  if (token && !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
   
   return children;
