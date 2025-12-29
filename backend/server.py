@@ -40,8 +40,12 @@ TWILIO_VERIFY_SERVICE = os.environ.get('TWILIO_VERIFY_SERVICE', '')
 
 # Subscription Plans
 SUBSCRIPTION_PLANS = {
-    "monthly": {"price": 6.99, "name": "Monthly Premium", "checks_per_month": -1},
-    "yearly": {"price": 59.00, "name": "Yearly Premium", "checks_per_month": -1},
+    # Shopper Plans
+    "monthly": {"price": 6.99, "name": "Premium Monthly", "checks_per_month": -1, "type": "shopper"},
+    "yearly": {"price": 59.00, "name": "Premium Yearly", "checks_per_month": -1, "type": "shopper"},
+    # Business Plans
+    "business_starter": {"price": 29.00, "name": "Business Starter", "checks_per_month": 100, "team_size": 3, "type": "business"},
+    "business_pro": {"price": 99.00, "name": "Business Pro", "checks_per_month": 500, "team_size": -1, "type": "business"},
 }
 FREE_CHECKS_PER_MONTH = 3
 
