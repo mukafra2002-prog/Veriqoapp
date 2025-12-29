@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, Header, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Header, Request, Response
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,11 +6,15 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, EmailStr
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
+import secrets
+import asyncio
+import httpx
+import resend
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -23,7 +27,16 @@ db = client[os.environ['DB_NAME']]
 # JWT Config
 JWT_SECRET = os.environ.get('JWT_SECRET', 'veriqo-secret-key-2024')
 JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_HOURS = 24
+JWT_EXPIRATION_HOURS = 24 * 7  # 7 days
+
+# Resend Config
+resend.api_key = os.environ.get('RESEND_API_KEY', '')
+SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
+
+# Twilio Config
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
+TWILIO_VERIFY_SERVICE = os.environ.get('TWILIO_VERIFY_SERVICE', '')
 
 # Subscription Plans
 SUBSCRIPTION_PLANS = {
@@ -46,12 +59,28 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class PhoneLoginRequest(BaseModel):
+    phone_number: str
+
+class PhoneVerifyRequest(BaseModel):
+    phone_number: str
+    code: str
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
 class UserResponse(BaseModel):
     id: str
-    email: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
     name: str
+    picture: Optional[str] = None
     subscription_type: str
-    subscription_expires: Optional[str]
+    subscription_expires: Optional[str] = None
     checks_used_this_month: int
     checks_remaining: int
     created_at: str
@@ -71,10 +100,10 @@ class Complaint(BaseModel):
 class ProductAnalysisResponse(BaseModel):
     id: str
     product_name: str
-    product_image: Optional[str]
+    product_image: Optional[str] = None
     amazon_url: str
-    verdict: str  # "buy", "think", "avoid"
-    confidence_score: int  # 0-100
+    verdict: str
+    confidence_score: int
     top_complaints: List[Complaint]
     who_should_not_buy: List[str]
     summary: str
@@ -103,11 +132,20 @@ def create_token(user_id: str) -> str:
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
-async def get_current_user(authorization: str = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid authorization header")
+async def get_current_user(authorization: str = Header(None), request: Request = None):
+    token = None
     
-    token = authorization.split(" ")[1]
+    # Try to get token from Authorization header
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ")[1]
+    
+    # Try to get token from cookie
+    if not token and request:
+        token = request.cookies.get("session_token")
+    
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_id = payload.get("user_id")
@@ -123,12 +161,14 @@ async def get_current_user(authorization: str = Header(None)):
 def get_user_response(user: dict) -> UserResponse:
     checks_remaining = FREE_CHECKS_PER_MONTH - user.get("checks_used_this_month", 0)
     if user.get("subscription_type") == "premium":
-        checks_remaining = -1  # unlimited
+        checks_remaining = -1
     
     return UserResponse(
         id=user["id"],
-        email=user["email"],
+        email=user.get("email"),
+        phone=user.get("phone"),
         name=user["name"],
+        picture=user.get("picture"),
         subscription_type=user.get("subscription_type", "free"),
         subscription_expires=user.get("subscription_expires"),
         checks_used_this_month=user.get("checks_used_this_month", 0),
@@ -136,7 +176,9 @@ def get_user_response(user: dict) -> UserResponse:
         created_at=user.get("created_at", "")
     )
 
-# Auth Routes
+# ==================== AUTH ROUTES ====================
+
+# Email/Password Registration
 @api_router.post("/auth/register", response_model=TokenResponse)
 async def register(data: UserCreate):
     existing = await db.users.find_one({"email": data.email})
@@ -164,61 +206,301 @@ async def register(data: UserCreate):
     
     return TokenResponse(token=token, user=get_user_response(user))
 
+# Email/Password Login
 @api_router.post("/auth/login", response_model=TokenResponse)
 async def login(data: UserLogin):
     user = await db.users.find_one({"email": data.email}, {"_id": 0})
-    if not user or not verify_password(data.password, user["password_hash"]):
+    if not user or not user.get("password_hash") or not verify_password(data.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     token = create_token(user["id"])
     return TokenResponse(token=token, user=get_user_response(user))
 
+# Google OAuth Session Handler
+@api_router.post("/auth/google/session")
+async def google_auth_session(request: Request, response: Response):
+    body = await request.json()
+    session_id = body.get("session_id")
+    
+    if not session_id:
+        raise HTTPException(status_code=400, detail="Session ID required")
+    
+    # Fetch user data from Emergent auth service
+    async with httpx.AsyncClient() as http_client:
+        try:
+            auth_response = await http_client.get(
+                "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+                headers={"X-Session-ID": session_id}
+            )
+            if auth_response.status_code != 200:
+                raise HTTPException(status_code=401, detail="Invalid session")
+            
+            auth_data = auth_response.json()
+        except Exception as e:
+            logging.error(f"Google auth error: {e}")
+            raise HTTPException(status_code=500, detail="Authentication failed")
+    
+    # Check if user exists
+    email = auth_data.get("email")
+    existing_user = await db.users.find_one({"email": email}, {"_id": 0})
+    
+    if existing_user:
+        user = existing_user
+        # Update user info if needed
+        await db.users.update_one(
+            {"email": email},
+            {"$set": {
+                "name": auth_data.get("name", existing_user.get("name")),
+                "picture": auth_data.get("picture")
+            }}
+        )
+        user["name"] = auth_data.get("name", existing_user.get("name"))
+        user["picture"] = auth_data.get("picture")
+    else:
+        # Create new user
+        user_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc).isoformat()
+        user = {
+            "id": user_id,
+            "email": email,
+            "name": auth_data.get("name", "User"),
+            "picture": auth_data.get("picture"),
+            "subscription_type": "free",
+            "subscription_expires": None,
+            "checks_used_this_month": 0,
+            "month_reset_date": now,
+            "onboarding_completed": False,
+            "created_at": now
+        }
+        await db.users.insert_one(user)
+    
+    # Create JWT token
+    token = create_token(user["id"])
+    
+    # Set cookie
+    response.set_cookie(
+        key="session_token",
+        value=token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        max_age=7 * 24 * 60 * 60,
+        path="/"
+    )
+    
+    return {"token": token, "user": get_user_response(user)}
+
+# Phone OTP - Send Code
+@api_router.post("/auth/phone/send-otp")
+async def send_phone_otp(data: PhoneLoginRequest):
+    if not TWILIO_ACCOUNT_SID or not TWILIO_AUTH_TOKEN or not TWILIO_VERIFY_SERVICE:
+        # Mock OTP for development
+        otp_code = "123456"
+        await db.phone_otps.update_one(
+            {"phone": data.phone_number},
+            {"$set": {
+                "phone": data.phone_number,
+                "code": otp_code,
+                "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }},
+            upsert=True
+        )
+        return {"status": "pending", "message": "OTP sent (dev mode: 123456)"}
+    
+    from twilio.rest import Client
+    twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    
+    try:
+        verification = twilio_client.verify.services(TWILIO_VERIFY_SERVICE) \
+            .verifications.create(to=data.phone_number, channel="sms")
+        return {"status": verification.status}
+    except Exception as e:
+        logging.error(f"Twilio error: {e}")
+        raise HTTPException(status_code=400, detail="Failed to send OTP")
+
+# Phone OTP - Verify Code
+@api_router.post("/auth/phone/verify-otp", response_model=TokenResponse)
+async def verify_phone_otp(data: PhoneVerifyRequest):
+    is_valid = False
+    
+    if not TWILIO_ACCOUNT_SID or not TWILIO_AUTH_TOKEN or not TWILIO_VERIFY_SERVICE:
+        # Mock verification for development
+        otp_record = await db.phone_otps.find_one({"phone": data.phone_number}, {"_id": 0})
+        if otp_record and otp_record.get("code") == data.code:
+            is_valid = True
+            await db.phone_otps.delete_one({"phone": data.phone_number})
+    else:
+        from twilio.rest import Client
+        twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        
+        try:
+            check = twilio_client.verify.services(TWILIO_VERIFY_SERVICE) \
+                .verification_checks.create(to=data.phone_number, code=data.code)
+            is_valid = check.status == "approved"
+        except Exception as e:
+            logging.error(f"Twilio verify error: {e}")
+            raise HTTPException(status_code=400, detail="Verification failed")
+    
+    if not is_valid:
+        raise HTTPException(status_code=400, detail="Invalid OTP code")
+    
+    # Find or create user by phone
+    existing_user = await db.users.find_one({"phone": data.phone_number}, {"_id": 0})
+    
+    if existing_user:
+        user = existing_user
+    else:
+        user_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc).isoformat()
+        user = {
+            "id": user_id,
+            "phone": data.phone_number,
+            "name": f"User {data.phone_number[-4:]}",
+            "subscription_type": "free",
+            "subscription_expires": None,
+            "checks_used_this_month": 0,
+            "month_reset_date": now,
+            "onboarding_completed": False,
+            "created_at": now
+        }
+        await db.users.insert_one(user)
+    
+    token = create_token(user["id"])
+    return TokenResponse(token=token, user=get_user_response(user))
+
+# Forgot Password - Request Reset
+@api_router.post("/auth/forgot-password")
+async def forgot_password(data: ForgotPasswordRequest):
+    user = await db.users.find_one({"email": data.email}, {"_id": 0})
+    
+    # Always return success to prevent email enumeration
+    if not user:
+        return {"message": "If an account exists, a reset link has been sent"}
+    
+    # Generate reset token
+    reset_token = secrets.token_urlsafe(32)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    
+    await db.password_resets.update_one(
+        {"email": data.email},
+        {"$set": {
+            "email": data.email,
+            "token": reset_token,
+            "expires_at": expires_at.isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    
+    # Send email
+    if resend.api_key:
+        try:
+            reset_link = f"https://veriqo.app/reset-password?token={reset_token}"
+            html_content = f"""
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #2563eb;">Reset Your Password</h2>
+                <p>You requested to reset your Veriqo password. Click the button below to create a new password:</p>
+                <a href="{reset_link}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin: 20px 0;">Reset Password</a>
+                <p style="color: #666; font-size: 14px;">This link expires in 1 hour. If you didn't request this, please ignore this email.</p>
+            </div>
+            """
+            
+            params = {
+                "from": SENDER_EMAIL,
+                "to": [data.email],
+                "subject": "Reset Your Veriqo Password",
+                "html": html_content
+            }
+            await asyncio.to_thread(resend.Emails.send, params)
+        except Exception as e:
+            logging.error(f"Email send error: {e}")
+    
+    return {"message": "If an account exists, a reset link has been sent"}
+
+# Reset Password
+@api_router.post("/auth/reset-password")
+async def reset_password(data: ResetPasswordRequest):
+    reset_record = await db.password_resets.find_one({"token": data.token}, {"_id": 0})
+    
+    if not reset_record:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+    
+    # Check expiry
+    expires_at = datetime.fromisoformat(reset_record["expires_at"].replace('Z', '+00:00'))
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    
+    if datetime.now(timezone.utc) > expires_at:
+        await db.password_resets.delete_one({"token": data.token})
+        raise HTTPException(status_code=400, detail="Reset token has expired")
+    
+    # Update password
+    await db.users.update_one(
+        {"email": reset_record["email"]},
+        {"$set": {"password_hash": hash_password(data.new_password)}}
+    )
+    
+    # Delete reset token
+    await db.password_resets.delete_one({"token": data.token})
+    
+    return {"message": "Password reset successfully"}
+
+# Get Current User
 @api_router.get("/auth/me", response_model=UserResponse)
 async def get_me(user: dict = Depends(get_current_user)):
     return get_user_response(user)
 
+# Complete Onboarding
 @api_router.put("/auth/complete-onboarding")
 async def complete_onboarding(user: dict = Depends(get_current_user)):
     await db.users.update_one({"id": user["id"]}, {"$set": {"onboarding_completed": True}})
     return {"success": True}
 
-# Product Analysis Routes
+# Logout
+@api_router.post("/auth/logout")
+async def logout(response: Response):
+    response.delete_cookie(key="session_token", path="/")
+    return {"message": "Logged out successfully"}
+
+# ==================== PRODUCT ANALYSIS ROUTES ====================
+
 @api_router.post("/analyze", response_model=ProductAnalysisResponse)
 async def analyze_product(data: ProductAnalysisRequest, user: dict = Depends(get_current_user)):
     # Check usage limits
     if user.get("subscription_type") != "premium":
-        # Reset monthly checks if needed
         month_reset = user.get("month_reset_date", "")
         if month_reset:
-            reset_date = datetime.fromisoformat(month_reset.replace('Z', '+00:00'))
-            if datetime.now(timezone.utc) - reset_date > timedelta(days=30):
-                await db.users.update_one(
-                    {"id": user["id"]},
-                    {"$set": {"checks_used_this_month": 0, "month_reset_date": datetime.now(timezone.utc).isoformat()}}
-                )
-                user["checks_used_this_month"] = 0
+            try:
+                reset_date = datetime.fromisoformat(month_reset.replace('Z', '+00:00'))
+                if reset_date.tzinfo is None:
+                    reset_date = reset_date.replace(tzinfo=timezone.utc)
+                if datetime.now(timezone.utc) - reset_date > timedelta(days=30):
+                    await db.users.update_one(
+                        {"id": user["id"]},
+                        {"$set": {"checks_used_this_month": 0, "month_reset_date": datetime.now(timezone.utc).isoformat()}}
+                    )
+                    user["checks_used_this_month"] = 0
+            except:
+                pass
         
         if user.get("checks_used_this_month", 0) >= FREE_CHECKS_PER_MONTH:
             raise HTTPException(status_code=403, detail="Free checks exhausted. Upgrade to premium for unlimited checks.")
     
-    # Validate Amazon URL
     if "amazon.com" not in data.amazon_url and "amzn.to" not in data.amazon_url:
         raise HTTPException(status_code=400, detail="Please provide a valid Amazon product URL")
     
-    # Perform AI analysis
     try:
         analysis = await perform_ai_analysis(data.amazon_url)
     except Exception as e:
         logging.error(f"AI Analysis error: {e}")
         raise HTTPException(status_code=500, detail="Failed to analyze product. Please try again.")
     
-    # Increment usage
     await db.users.update_one(
         {"id": user["id"]},
         {"$inc": {"checks_used_this_month": 1}}
     )
     
-    # Save analysis to history
     analysis_id = str(uuid.uuid4())
     analysis_doc = {
         "id": analysis_id,
@@ -235,7 +517,6 @@ async def analyze_product(data: ProductAnalysisRequest, user: dict = Depends(get
     )
 
 async def perform_ai_analysis(amazon_url: str) -> dict:
-    """Perform AI-powered analysis of Amazon product reviews"""
     from emergentintegrations.llm.chat import LlmChat, UserMessage
     import json
     import re
@@ -243,10 +524,6 @@ async def perform_ai_analysis(amazon_url: str) -> dict:
     api_key = os.environ.get('EMERGENT_LLM_KEY')
     if not api_key:
         raise Exception("EMERGENT_LLM_KEY not configured")
-    
-    # Extract ASIN from URL for mock product data
-    asin_match = re.search(r'/dp/([A-Z0-9]{10})', amazon_url) or re.search(r'/product/([A-Z0-9]{10})', amazon_url)
-    asin = asin_match.group(1) if asin_match else "B0UNKNOWN"
     
     chat = LlmChat(
         api_key=api_key,
@@ -282,31 +559,27 @@ Respond ONLY with valid JSON in this exact format:
     
     response = await chat.send_message(user_message)
     
-    # Parse JSON from response
     try:
-        # Try to extract JSON from response
         json_match = re.search(r'\{[\s\S]*\}', response)
         if json_match:
             result = json.loads(json_match.group())
         else:
-            raise ValueError("No JSON found in response")
-    except json.JSONDecodeError:
-        # Fallback to mock data if parsing fails
+            raise ValueError("No JSON found")
+    except:
         result = {
             "product_name": "Amazon Product",
             "product_image": None,
             "verdict": "think",
             "confidence_score": 65,
             "top_complaints": [
-                {"title": "Quality Concerns", "description": "Some users report build quality issues after extended use", "frequency": "15% of reviews"},
-                {"title": "Shipping Issues", "description": "Occasional delays and packaging concerns reported", "frequency": "8% of reviews"},
-                {"title": "Size Variations", "description": "Product dimensions may vary slightly from listing", "frequency": "5% of reviews"}
+                {"title": "Quality Concerns", "description": "Some users report build quality issues", "frequency": "15% of reviews"},
+                {"title": "Shipping Issues", "description": "Occasional delays reported", "frequency": "8% of reviews"},
+                {"title": "Size Variations", "description": "Dimensions may vary", "frequency": "5% of reviews"}
             ],
-            "who_should_not_buy": ["Users seeking premium build quality", "Those needing immediate delivery"],
-            "summary": "This product offers decent value but has some quality control issues. Good for casual use but may not meet professional standards."
+            "who_should_not_buy": ["Users seeking premium quality", "Those needing immediate delivery"],
+            "summary": "Decent value but has some quality control issues."
         }
     
-    # Add Amazon URL and affiliate link
     affiliate_tag = "veriqo-20"
     affiliate_url = f"{amazon_url}?tag={affiliate_tag}" if "?" not in amazon_url else f"{amazon_url}&tag={affiliate_tag}"
     
@@ -324,7 +597,8 @@ async def get_history(user: dict = Depends(get_current_user)):
     
     return analyses
 
-# Payment Routes
+# ==================== PAYMENT ROUTES ====================
+
 @api_router.post("/payments/checkout", response_model=CheckoutResponse)
 async def create_checkout(data: CheckoutRequest, request: Request, user: dict = Depends(get_current_user)):
     from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
@@ -354,13 +628,12 @@ async def create_checkout(data: CheckoutRequest, request: Request, user: dict = 
         metadata={
             "user_id": user["id"],
             "plan_id": data.plan_id,
-            "user_email": user["email"]
+            "user_email": user.get("email", "")
         }
     )
     
     session = await stripe_checkout.create_checkout_session(checkout_request)
     
-    # Create payment transaction record
     transaction = {
         "id": str(uuid.uuid4()),
         "session_id": session.session_id,
@@ -384,17 +657,14 @@ async def check_payment_status(session_id: str, user: dict = Depends(get_current
     
     status = await stripe_checkout.get_checkout_status(session_id)
     
-    # Update transaction and user subscription if paid
     if status.payment_status == "paid":
         transaction = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
         if transaction and transaction.get("payment_status") != "completed":
-            # Update transaction
             await db.payment_transactions.update_one(
                 {"session_id": session_id},
                 {"$set": {"payment_status": "completed", "completed_at": datetime.now(timezone.utc).isoformat()}}
             )
             
-            # Update user subscription
             plan_id = transaction.get("plan_id", "monthly")
             expires = datetime.now(timezone.utc) + timedelta(days=365 if plan_id == "yearly" else 30)
             
