@@ -4,19 +4,14 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { toast } from 'sonner';
-import { Zap, ArrowLeft, Loader2, Mail, Phone, Chrome } from 'lucide-react';
+import { Zap, ArrowLeft, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('email');
-  const { login, loginWithPhone, sendPhoneOTP } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleEmailLogin = async (e) => {
@@ -43,44 +38,6 @@ export default function LoginPage() {
     // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
     const redirectUrl = window.location.origin + '/auth/callback';
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
-  };
-
-  const handleSendOTP = async () => {
-    if (!phoneNumber || phoneNumber.length < 10) {
-      toast.error('Please enter a valid phone number');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await sendPhoneOTP(phoneNumber);
-      setOtpSent(true);
-      toast.success('OTP sent! Check your phone');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to send OTP');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePhoneLogin = async (e) => {
-    e.preventDefault();
-    
-    if (!otpCode || otpCode.length !== 6) {
-      toast.error('Please enter the 6-digit OTP code');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await loginWithPhone(phoneNumber, otpCode);
-      toast.success('Welcome!');
-      navigate('/home');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Invalid OTP code');
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -124,155 +81,59 @@ export default function LoginPage() {
               <div className="w-full border-t border-white/10"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-slate-950 text-slate-500">or sign in with</span>
+              <span className="px-4 bg-slate-950 text-slate-500">or sign in with email</span>
             </div>
           </div>
 
-          {/* Tabs for Email/Phone */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full h-12 bg-white/5 border border-white/10 rounded-xl p-1 mb-6">
-              <TabsTrigger 
-                value="email" 
-                className="flex-1 h-10 rounded-lg data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400"
-              >
-                <Mail className="w-4 h-4 mr-2" />
-                Email
-              </TabsTrigger>
-              <TabsTrigger 
-                value="phone"
-                className="flex-1 h-10 rounded-lg data-[state=active]:bg-white/10 data-[state=active]:text-white text-slate-400"
-              >
-                <Phone className="w-4 h-4 mr-2" />
-                Phone
-              </TabsTrigger>
-            </TabsList>
+          {/* Email Login Form */}
+          <form onSubmit={handleEmailLogin} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-slate-300">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
+                data-testid="login-email"
+              />
+            </div>
 
-            <TabsContent value="email">
-              <form onSubmit={handleEmailLogin} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-slate-300">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
-                    data-testid="login-email"
-                  />
-                </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-slate-300">Password</Label>
+                <Link to="/forgot-password" className="text-sm text-blue-400 hover:text-blue-300" data-testid="forgot-password-link">
+                  Forgot password?
+                </Link>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
+                data-testid="login-password"
+              />
+            </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="text-slate-300">Password</Label>
-                    <Link to="/forgot-password" className="text-sm text-blue-400 hover:text-blue-300" data-testid="forgot-password-link">
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
-                    data-testid="login-password"
-                  />
-                </div>
-
-                <Button 
-                  type="submit" 
-                  className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold"
-                  disabled={loading}
-                  data-testid="login-submit"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    'Sign in'
-                  )}
-                </Button>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="phone">
-              <form onSubmit={handlePhoneLogin} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-slate-300">Phone Number</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+1 (555) 123-4567"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      disabled={otpSent}
-                      className="flex-1 h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
-                      data-testid="login-phone"
-                    />
-                    {!otpSent && (
-                      <Button 
-                        type="button"
-                        onClick={handleSendOTP}
-                        className="h-12 px-6 bg-blue-600 hover:bg-blue-500 text-white rounded-xl"
-                        disabled={loading}
-                        data-testid="send-otp-btn"
-                      >
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send OTP'}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                {otpSent && (
-                  <>
-                    <div className="space-y-2">
-                      <Label htmlFor="otp" className="text-slate-300">Enter OTP Code</Label>
-                      <Input
-                        id="otp"
-                        type="text"
-                        placeholder="123456"
-                        maxLength={6}
-                        value={otpCode}
-                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                        className="h-12 bg-white/5 border-white/10 text-white text-center text-2xl tracking-widest placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
-                        data-testid="login-otp"
-                      />
-                      <p className="text-sm text-slate-500">
-                        Didn't receive code?{' '}
-                        <button 
-                          type="button"
-                          onClick={handleSendOTP}
-                          className="text-blue-400 hover:text-blue-300"
-                        >
-                          Resend
-                        </button>
-                      </p>
-                    </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold"
-                      disabled={loading}
-                      data-testid="verify-otp-btn"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Verifying...
-                        </>
-                      ) : (
-                        'Verify & Sign in'
-                      )}
-                    </Button>
-                  </>
-                )}
-              </form>
-            </TabsContent>
-          </Tabs>
+            <Button 
+              type="submit" 
+              className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold"
+              disabled={loading}
+              data-testid="login-submit"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign in'
+              )}
+            </Button>
+          </form>
 
           <p className="text-center text-slate-400 mt-8">
             Don't have an account?{' '}
