@@ -12,6 +12,7 @@ import ResultsPage from "./pages/ResultsPage";
 import PricingPage from "./pages/PricingPage";
 import AccountPage from "./pages/AccountPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import HistoryPage from "./pages/HistoryPage";
 import "./App.css";
 
 // Protected Route Component
@@ -93,6 +94,7 @@ function AppRouter() {
       <Route path="/results/:id" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
       <Route path="/pricing" element={<ProtectedRoute><PricingPage /></ProtectedRoute>} />
       <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
+      <Route path="/history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
       <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccessPage /></ProtectedRoute>} />
       
       {/* Catch all */}

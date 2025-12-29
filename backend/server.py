@@ -731,13 +731,63 @@ async def scrape_amazon_product(url: str) -> dict:
         return {}
 
 @api_router.get("/history", response_model=List[ProductAnalysisResponse])
-async def get_history(user: dict = Depends(get_current_user)):
+async def get_history(user: dict = Depends(get_current_user), limit: int = 100):
     analyses = await db.product_analyses.find(
         {"user_id": user["id"]},
         {"_id": 0}
-    ).sort("analyzed_at", -1).limit(10).to_list(10)
+    ).sort("analyzed_at", -1).limit(limit).to_list(limit)
     
     return analyses
+
+@api_router.get("/history/export")
+async def export_history(user: dict = Depends(get_current_user)):
+    """Export user's analysis history as CSV. Available for Premium and Business plans."""
+    import io
+    import csv
+    from fastapi.responses import StreamingResponse
+    
+    # Check subscription
+    if user.get("subscription_type") == "free":
+        raise HTTPException(status_code=403, detail="CSV export is available for Premium and Business plans")
+    
+    # Fetch all analyses
+    analyses = await db.product_analyses.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("analyzed_at", -1).to_list(1000)
+    
+    # Create CSV
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow([
+        "Product Name", "Verdict", "Score", "Summary", 
+        "Top Complaints", "Who Should Not Buy", "Amazon URL", "Analyzed At"
+    ])
+    
+    # Data rows
+    for analysis in analyses:
+        complaints = "; ".join([c.get("title", "") for c in analysis.get("top_complaints", [])])
+        who_not = "; ".join(analysis.get("who_should_not_buy", []))
+        writer.writerow([
+            analysis.get("product_name", ""),
+            analysis.get("verdict", ""),
+            analysis.get("confidence_score", ""),
+            analysis.get("summary", ""),
+            complaints,
+            who_not,
+            analysis.get("amazon_url", ""),
+            analysis.get("analyzed_at", "")
+        ])
+    
+    output.seek(0)
+    
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=veriqo-history-{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.csv"}
+    )
 
 # ==================== PAYMENT ROUTES ====================
 
