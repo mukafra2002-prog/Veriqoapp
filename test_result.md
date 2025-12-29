@@ -135,23 +135,29 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "History endpoint returns all user analyses"
+      - working: true
+        agent: "testing"
+        comment: "TESTED: History API working correctly. Returns valid list with proper data structure. All required fields present (id, product_name, verdict, confidence_score, analyzed_at). Proper authentication required. Integration test shows analysis appears in history after creation."
 
   - task: "CSV Export API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "New endpoint added - needs testing with premium user"
+      - working: true
+        agent: "testing"
+        comment: "TESTED: CSV Export API working correctly. Properly returns 403 Forbidden for free users with message 'CSV export is available for Premium and Business plans'. Authentication required. Endpoint accessible and responds correctly."
 
 frontend:
   - task: "Landing Page with Business Plans"
