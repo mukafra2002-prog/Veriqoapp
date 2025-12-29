@@ -343,30 +343,59 @@ class VeriqoAPITester:
         return success
 
 def main():
-    print("🚀 Starting Veriqo API Tests")
-    print("=" * 50)
+    print("🚀 Starting Veriqo API Tests - Focus on Session Persistence & History")
+    print("=" * 70)
     
     # Setup
     tester = VeriqoAPITester()
     
-    # Test sequence
+    # Test with the specific credentials from review request
+    test_email = "testuser@example.com"
+    test_password = "password123"
+    
+    print(f"📧 Using test credentials: {test_email}")
+    
+    # Core test sequence focusing on review requirements
     tests = [
         ("Health Check", tester.test_health_check),
-        ("User Registration", lambda: tester.test_register()),
+        ("Login with Test User", lambda: tester.test_login(test_email, test_password)),
+        ("Session Persistence Test", tester.test_session_persistence_simulation),
         ("Get Current User", tester.test_get_me),
-        ("Complete Onboarding", tester.test_complete_onboarding),
-        ("Product Analysis", tester.test_analyze_product),
         ("Get Analysis History", tester.test_get_history),
-        ("Invalid Amazon URL", tester.test_invalid_amazon_url),
-        ("Unauthorized Access", tester.test_unauthorized_access),
-        ("Forgot Password", tester.test_forgot_password),
-        ("Phone Send OTP", tester.test_phone_send_otp),
-        ("Phone Verify OTP", lambda: tester.test_phone_verify_otp()[0]),
-        ("Google OAuth Invalid", tester.test_google_session_invalid),
+        ("CSV Export (Free User)", tester.test_csv_export_free_user),
+        ("Product Analysis Integration", tester.test_product_analysis_integration),
     ]
     
     # Run tests
+    failed_tests = []
     for test_name, test_func in tests:
+        try:
+            print(f"\n{'='*50}")
+            result = test_func()
+            if isinstance(result, tuple):
+                success = result[0]
+            else:
+                success = result
+                
+            if not success:
+                failed_tests.append(test_name)
+                print(f"⚠️  Test '{test_name}' failed")
+            else:
+                print(f"✅ Test '{test_name}' passed")
+        except Exception as e:
+            failed_tests.append(test_name)
+            print(f"💥 Test '{test_name}' crashed: {str(e)}")
+    
+    # Additional tests for completeness
+    print(f"\n{'='*50}")
+    print("🔄 Running additional validation tests...")
+    
+    additional_tests = [
+        ("Invalid Amazon URL", tester.test_invalid_amazon_url),
+        ("Unauthorized Access", tester.test_unauthorized_access),
+    ]
+    
+    for test_name, test_func in additional_tests:
         try:
             result = test_func()
             if isinstance(result, tuple):
@@ -375,19 +404,20 @@ def main():
                 success = result
                 
             if not success:
-                print(f"⚠️  Test '{test_name}' failed but continuing...")
+                failed_tests.append(test_name)
+                print(f"⚠️  Additional test '{test_name}' failed")
         except Exception as e:
-            print(f"💥 Test '{test_name}' crashed: {str(e)}")
-    
-    # Test login with existing user
-    print(f"\n🔄 Testing login with existing user...")
-    if tester.test_login():
-        print("✅ Login with existing user successful")
-        tester.test_get_me()
+            failed_tests.append(test_name)
+            print(f"💥 Additional test '{test_name}' crashed: {str(e)}")
     
     # Print results
-    print("\n" + "=" * 50)
+    print("\n" + "=" * 70)
     print(f"📊 Test Results: {tester.tests_passed}/{tester.tests_run} passed")
+    
+    if failed_tests:
+        print(f"\n❌ Failed Tests ({len(failed_tests)}):")
+        for test in failed_tests:
+            print(f"   • {test}")
     
     if tester.tests_passed == tester.tests_run:
         print("🎉 All tests passed!")
