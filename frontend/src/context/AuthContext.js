@@ -114,6 +114,7 @@ export const AuthProvider = ({ children }) => {
       user,
       token,
       loading,
+      authChecked,
       login,
       register,
       processGoogleAuth,
