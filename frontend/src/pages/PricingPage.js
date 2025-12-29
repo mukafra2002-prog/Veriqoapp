@@ -64,7 +64,6 @@ export default function PricingPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      // Redirect to Stripe
       window.location.href = response.data.url;
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to start checkout');
@@ -73,14 +72,14 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50" data-testid="pricing-page">
+    <div className="min-h-screen bg-slate-950" data-testid="pricing-page">
       <Navbar />
       
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Back Button */}
         <button
           onClick={() => navigate('/home')}
-          className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-8 transition-colors"
+          className="flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to home
@@ -88,26 +87,26 @@ export default function PricingPage() {
 
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-4">
             <Crown className="w-4 h-4" />
             Upgrade to Premium
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Unlimited product checks
           </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
             Never second-guess a purchase again. Get unlimited AI-powered review analysis.
           </p>
         </div>
 
         {/* Free Plan Info */}
         {user?.subscription_type !== 'premium' && (
-          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 text-center">
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6 mb-8 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Zap className="w-5 h-5 text-blue-600" />
-              <span className="font-semibold text-blue-900">Free Plan</span>
+              <Zap className="w-5 h-5 text-blue-400" />
+              <span className="font-semibold text-white">Free Plan</span>
             </div>
-            <p className="text-blue-700">
+            <p className="text-blue-300">
               You have <span className="font-bold">{user?.checks_remaining || 0}</span> of {3} free checks remaining this month
             </p>
           </div>
@@ -118,43 +117,47 @@ export default function PricingPage() {
           {plans.map((plan) => (
             <div 
               key={plan.id}
-              className={`pricing-card ${plan.popular ? 'popular' : ''} relative`}
+              className={`relative p-8 rounded-3xl border transition-all ${
+                plan.popular 
+                  ? 'bg-gradient-to-br from-blue-600/20 to-emerald-600/20 border-blue-500/30 shadow-xl shadow-blue-500/10' 
+                  : 'bg-white/5 border-white/10'
+              }`}
               data-testid={`plan-${plan.id}`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="px-4 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full">
+                  <span className="px-4 py-1 bg-gradient-to-r from-blue-600 to-emerald-600 text-white text-xs font-semibold rounded-full">
                     MOST POPULAR
                   </span>
                 </div>
               )}
 
               <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{plan.name}</h3>
+                <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-4xl font-bold text-slate-900">${plan.price}</span>
-                  <span className="text-slate-500">{plan.period}</span>
+                  <span className="text-4xl font-bold text-white">${plan.price}</span>
+                  <span className="text-slate-400">{plan.period}</span>
                 </div>
-                <p className="text-sm text-slate-600 mt-2">{plan.description}</p>
+                <p className="text-sm text-slate-400 mt-2">{plan.description}</p>
               </div>
 
               <ul className="space-y-3 mb-8">
                 {plan.features.map((feature, idx) => (
                   <li key={idx} className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-emerald-600" />
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-emerald-400" />
                     </div>
-                    <span className="text-slate-700 text-sm">{feature}</span>
+                    <span className="text-slate-300 text-sm">{feature}</span>
                   </li>
                 ))}
               </ul>
 
               <Button
                 onClick={() => handleSubscribe(plan.id)}
-                className={`w-full h-12 rounded-full font-semibold ${
+                className={`w-full h-12 rounded-xl font-semibold ${
                   plan.popular 
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-900'
+                    ? 'bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white'
+                    : 'bg-white/10 hover:bg-white/20 text-white'
                 }`}
                 disabled={loading === plan.id || user?.subscription_type === 'premium'}
                 data-testid={`subscribe-${plan.id}`}

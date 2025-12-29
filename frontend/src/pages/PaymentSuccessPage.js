@@ -13,7 +13,7 @@ export default function PaymentSuccessPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { token, refreshUser } = useAuth();
-  const [status, setStatus] = useState('loading'); // loading, success, error
+  const [status, setStatus] = useState('loading');
   const [attempts, setAttempts] = useState(0);
   const maxAttempts = 5;
   const sessionId = searchParams.get('session_id');
@@ -44,7 +44,6 @@ export default function PaymentSuccessPage() {
       } else if (response.data.status === 'expired') {
         setStatus('error');
       } else {
-        // Keep polling
         setAttempts(prev => prev + 1);
         setTimeout(checkPaymentStatus, 2000);
       }
@@ -60,25 +59,25 @@ export default function PaymentSuccessPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50" data-testid="payment-success-page">
+    <div className="min-h-screen bg-slate-950" data-testid="payment-success-page">
       <Navbar />
       
       <main className="max-w-md mx-auto px-4 py-24">
-        <div className="card-base text-center">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
           {status === 'loading' && (
             <>
-              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+              <div className="w-16 h-16 bg-blue-500/20 border border-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
               </div>
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">
+              <h1 className="text-2xl font-bold text-white mb-2">
                 Processing Payment
               </h1>
-              <p className="text-slate-600 mb-6">
+              <p className="text-slate-400 mb-6">
                 Please wait while we confirm your payment...
               </p>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-blue-600 rounded-full animate-pulse"
+                  className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full animate-pulse"
                   style={{ width: '60%' }}
                 ></div>
               </div>
@@ -87,22 +86,22 @@ export default function PaymentSuccessPage() {
 
           {status === 'success' && (
             <>
-              <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-8 h-8 text-emerald-600" />
+              <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="w-8 h-8 text-emerald-400" />
               </div>
-              <div className="inline-flex items-center gap-1 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm font-medium mb-4">
+              <div className="inline-flex items-center gap-1 px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-full text-sm font-medium mb-4">
                 <Crown className="w-4 h-4" />
                 Premium Activated
               </div>
-              <h1 className="text-2xl font-bold text-slate-900 mb-2" data-testid="success-title">
+              <h1 className="text-2xl font-bold text-white mb-2" data-testid="success-title">
                 Payment Successful!
               </h1>
-              <p className="text-slate-600 mb-8">
+              <p className="text-slate-400 mb-8">
                 Welcome to Veriqo Premium. You now have unlimited product checks!
               </p>
               <Button
                 onClick={() => navigate('/home')}
-                className="w-full h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold"
                 data-testid="continue-btn"
               >
                 Start Analyzing
@@ -113,26 +112,26 @@ export default function PaymentSuccessPage() {
 
           {status === 'error' && (
             <>
-              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <XCircle className="w-8 h-8 text-red-600" />
+              <div className="w-16 h-16 bg-red-500/20 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                <XCircle className="w-8 h-8 text-red-400" />
               </div>
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">
+              <h1 className="text-2xl font-bold text-white mb-2">
                 Payment Issue
               </h1>
-              <p className="text-slate-600 mb-8">
+              <p className="text-slate-400 mb-8">
                 We couldn't confirm your payment. If you were charged, please contact support.
               </p>
               <div className="space-y-3">
                 <Button
                   onClick={() => navigate('/pricing')}
-                  className="w-full h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                  className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold"
                 >
                   Try Again
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate('/home')}
-                  className="w-full h-12 rounded-full"
+                  className="w-full h-12 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white"
                 >
                   Go to Home
                 </Button>

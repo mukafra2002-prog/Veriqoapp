@@ -60,14 +60,14 @@ export default function ResultsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-slate-950">
         <Navbar />
         <div className="max-w-6xl mx-auto px-4 py-12">
           <div className="animate-pulse space-y-6">
-            <div className="skeleton h-8 w-48"></div>
+            <div className="h-8 w-48 bg-white/10 rounded"></div>
             <div className="grid md:grid-cols-12 gap-6">
-              <div className="md:col-span-4 skeleton h-64 rounded-2xl"></div>
-              <div className="md:col-span-8 skeleton h-64 rounded-2xl"></div>
+              <div className="md:col-span-4 h-64 bg-white/10 rounded-2xl"></div>
+              <div className="md:col-span-8 h-64 bg-white/10 rounded-2xl"></div>
             </div>
           </div>
         </div>
@@ -88,14 +88,14 @@ export default function ResultsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50" data-testid="results-page">
+    <div className="min-h-screen bg-slate-950" data-testid="results-page">
       <Navbar />
       
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <button
           onClick={() => navigate('/home')}
-          className="flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6 transition-colors"
+          className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors"
           data-testid="back-btn"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -104,15 +104,15 @@ export default function ResultsPage() {
 
         {/* Product Header */}
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2" data-testid="product-name">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2" data-testid="product-name">
             {analysis.product_name}
           </h1>
           <div className="flex items-center gap-4 text-sm text-slate-500">
-            <span className="flex items-center gap-1">
-              <Shield className="w-4 h-4" />
+            <span className="flex items-center gap-1.5">
+              <Shield className="w-4 h-4 text-blue-400" />
               Verified by AI
             </span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1.5">
               <Clock className="w-4 h-4" />
               Analyzed {new Date(analysis.analyzed_at).toLocaleDateString()}
             </span>
@@ -122,26 +122,26 @@ export default function ResultsPage() {
         {/* Bento Grid Layout */}
         <div className="bento-grid mb-8">
           {/* Score Card */}
-          <div className="bento-score card-base flex flex-col items-center justify-center" data-testid="score-card">
+          <div className="bento-score bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center" data-testid="score-card">
             <ScoreGauge score={analysis.confidence_score} verdict={analysis.verdict} />
-            <p className="text-sm text-slate-600 mt-4 text-center">
+            <p className="text-sm text-slate-500 mt-4 text-center">
               Based on verified customer reviews
             </p>
           </div>
 
           {/* Verdict Card */}
-          <div className="bento-verdict card-base" data-testid="verdict-card">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Summary</h2>
-            <p className="text-slate-600 mb-6">{analysis.summary}</p>
+          <div className="bento-verdict bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="verdict-card">
+            <h2 className="text-lg font-semibold text-white mb-4">Summary</h2>
+            <p className="text-slate-400 mb-6">{analysis.summary}</p>
             <div className={`p-4 rounded-xl ${
-              analysis.verdict === 'buy' ? 'bg-emerald-50 border border-emerald-100' :
-              analysis.verdict === 'think' ? 'bg-amber-50 border border-amber-100' :
-              'bg-red-50 border border-red-100'
+              analysis.verdict === 'buy' ? 'bg-emerald-500/10 border border-emerald-500/20' :
+              analysis.verdict === 'think' ? 'bg-amber-500/10 border border-amber-500/20' :
+              'bg-red-500/10 border border-red-500/20'
             }`}>
               <p className={`text-sm ${
-                analysis.verdict === 'buy' ? 'text-emerald-700' :
-                analysis.verdict === 'think' ? 'text-amber-700' :
-                'text-red-700'
+                analysis.verdict === 'buy' ? 'text-emerald-400' :
+                analysis.verdict === 'think' ? 'text-amber-400' :
+                'text-red-400'
               }`}>
                 {getVerdictDescription()}
               </p>
@@ -149,20 +149,20 @@ export default function ResultsPage() {
           </div>
 
           {/* Complaints Card */}
-          <div className="bento-complaints card-base" data-testid="complaints-card">
+          <div className="bento-complaints bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="complaints-card">
             <div className="flex items-center gap-2 mb-4">
-              <AlertTriangle className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-semibold text-slate-900">Top 3 Complaints</h2>
+              <AlertTriangle className="w-5 h-5 text-amber-400" />
+              <h2 className="text-lg font-semibold text-white">Top 3 Complaints</h2>
             </div>
             <div className="space-y-4">
               {analysis.top_complaints.map((complaint, idx) => (
-                <div key={idx} className="complaint-card" data-testid={`complaint-${idx}`}>
+                <div key={idx} className="p-4 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-colors" data-testid={`complaint-${idx}`}>
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h3 className="font-semibold text-slate-900 mb-1">{complaint.title}</h3>
-                      <p className="text-sm text-slate-600">{complaint.description}</p>
+                      <h3 className="font-semibold text-white mb-1">{complaint.title}</h3>
+                      <p className="text-sm text-slate-400">{complaint.description}</p>
                     </div>
-                    <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full whitespace-nowrap">
+                    <span className="text-xs font-medium text-slate-500 bg-white/5 px-2 py-1 rounded-full whitespace-nowrap">
                       {complaint.frequency}
                     </span>
                   </div>
@@ -172,20 +172,20 @@ export default function ResultsPage() {
           </div>
 
           {/* Who Should Not Buy */}
-          <div className="bento-full card-base" data-testid="who-should-not-buy">
+          <div className="bento-full bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="who-should-not-buy">
             <div className="flex items-center gap-2 mb-4">
-              <UserX className="w-5 h-5 text-red-500" />
-              <h2 className="text-lg font-semibold text-slate-900">Who Should NOT Buy This</h2>
+              <UserX className="w-5 h-5 text-red-400" />
+              <h2 className="text-lg font-semibold text-white">Who Should NOT Buy This</h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {analysis.who_should_not_buy.map((item, idx) => (
                 <div 
                   key={idx} 
-                  className="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-xl"
+                  className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl"
                   data-testid={`not-buy-${idx}`}
                 >
                   <div className="w-2 h-2 bg-red-400 rounded-full flex-shrink-0"></div>
-                  <span className="text-sm text-red-700">{item}</span>
+                  <span className="text-sm text-red-300">{item}</span>
                 </div>
               ))}
             </div>
@@ -198,7 +198,7 @@ export default function ResultsPage() {
             href={analysis.affiliate_url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="affiliate-btn"
+            className="inline-flex items-center justify-center gap-2 h-14 px-8 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-semibold shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all hover:scale-105"
             data-testid="buy-on-amazon-btn"
           >
             <ExternalLink className="w-5 h-5" />
@@ -207,7 +207,7 @@ export default function ResultsPage() {
           
           <Button
             variant="outline"
-            className="h-12 px-6 rounded-xl"
+            className="h-14 px-8 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white"
             onClick={handleShare}
             data-testid="share-btn"
           >
@@ -218,7 +218,7 @@ export default function ResultsPage() {
           {user?.subscription_type === 'premium' && (
             <Button
               variant="outline"
-              className="h-12 px-6 rounded-xl"
+              className="h-14 px-8 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white"
               data-testid="save-btn"
             >
               <Bookmark className="w-4 h-4 mr-2" />
