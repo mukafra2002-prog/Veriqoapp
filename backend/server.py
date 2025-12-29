@@ -697,17 +697,6 @@ async def scrape_amazon_product(url: str) -> dict:
     except Exception as e:
         logging.error(f"Amazon scrape error: {e}")
         return {}
-            "who_should_not_buy": ["Users seeking premium quality", "Those needing immediate delivery"],
-            "summary": "Decent value but has some quality control issues."
-        }
-    
-    affiliate_tag = "veriqo-20"
-    affiliate_url = f"{amazon_url}?tag={affiliate_tag}" if "?" not in amazon_url else f"{amazon_url}&tag={affiliate_tag}"
-    
-    result["amazon_url"] = amazon_url
-    result["affiliate_url"] = affiliate_url
-    
-    return result
 
 @api_router.get("/history", response_model=List[ProductAnalysisResponse])
 async def get_history(user: dict = Depends(get_current_user)):
