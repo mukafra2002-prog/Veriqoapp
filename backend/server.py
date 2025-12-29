@@ -520,6 +520,7 @@ async def analyze_product(data: ProductAnalysisRequest, user: dict = Depends(get
 
 async def perform_ai_analysis(amazon_url: str) -> dict:
     from emergentintegrations.llm.chat import LlmChat, UserMessage
+    from bs4 import BeautifulSoup
     import json
     import re
     
@@ -527,17 +528,40 @@ async def perform_ai_analysis(amazon_url: str) -> dict:
     if not api_key:
         raise Exception("EMERGENT_LLM_KEY not configured")
     
+    # Try to scrape real Amazon product data
+    scraped_data = await scrape_amazon_product(amazon_url)
+    
+    # Build AI prompt with scraped data if available
+    if scraped_data and scraped_data.get("product_name"):
+        product_context = f"""
+Product Name: {scraped_data.get('product_name', 'Unknown')}
+Price: {scraped_data.get('price', 'Unknown')}
+Rating: {scraped_data.get('rating', 'Unknown')}
+Review Count: {scraped_data.get('review_count', 'Unknown')}
+Sample Reviews:
+{scraped_data.get('sample_reviews', 'No reviews available')}
+"""
+        prompt = f"""Analyze this Amazon product based on the following real data:
+
+{product_context}
+
+URL: {amazon_url}
+
+Based on this information, provide your analysis with a Buy/Think/Avoid verdict."""
+    else:
+        prompt = f"Analyze this Amazon product URL and provide your verdict: {amazon_url}\n\nGenerate a realistic analysis for this product. Be specific and helpful."
+    
     chat = LlmChat(
         api_key=api_key,
         session_id=f"veriqo-analysis-{uuid.uuid4()}",
         system_message="""You are Veriqo, an expert Amazon product review analyzer. Your job is to help shoppers make confident purchase decisions by analyzing product reviews.
 
-Given an Amazon product URL, you will generate a realistic analysis as if you had analyzed actual reviews. Generate a realistic product scenario with:
+Given product data (or just a URL), analyze and provide:
 1. A verdict: "buy" (score 70-100), "think" (score 40-69), or "avoid" (score 0-39)
 2. A confidence score from 0-100
-3. Top 3 real-sounding complaints from verified reviews
+3. Top 3 real complaints from reviews (or realistic ones if no reviews provided)
 4. Who should NOT buy this product (2-3 specific user types)
-5. A brief summary of the product's pros and cons
+5. A brief summary
 
 Respond ONLY with valid JSON in this exact format:
 {
@@ -555,10 +579,7 @@ Respond ONLY with valid JSON in this exact format:
 }"""
     ).with_model("openai", "gpt-5.2")
     
-    user_message = UserMessage(
-        text=f"Analyze this Amazon product URL and provide your verdict: {amazon_url}\n\nGenerate a realistic analysis for this product. Be specific and helpful."
-    )
-    
+    user_message = UserMessage(text=prompt)
     response = await chat.send_message(user_message)
     
     try:
@@ -567,10 +588,17 @@ Respond ONLY with valid JSON in this exact format:
             result = json.loads(json_match.group())
         else:
             raise ValueError("No JSON found")
+        
+        # Use scraped product name if AI didn't provide one
+        if scraped_data and scraped_data.get("product_name") and result.get("product_name") == "Product Name Here":
+            result["product_name"] = scraped_data["product_name"]
+        if scraped_data and scraped_data.get("product_image"):
+            result["product_image"] = scraped_data["product_image"]
+            
     except:
         result = {
-            "product_name": "Amazon Product",
-            "product_image": None,
+            "product_name": scraped_data.get("product_name", "Amazon Product") if scraped_data else "Amazon Product",
+            "product_image": scraped_data.get("product_image") if scraped_data else None,
             "verdict": "think",
             "confidence_score": 65,
             "top_complaints": [
@@ -578,6 +606,97 @@ Respond ONLY with valid JSON in this exact format:
                 {"title": "Shipping Issues", "description": "Occasional delays reported", "frequency": "8% of reviews"},
                 {"title": "Size Variations", "description": "Dimensions may vary", "frequency": "5% of reviews"}
             ],
+            "who_should_not_buy": ["Users seeking premium quality", "Those needing immediate delivery"],
+            "summary": "Decent value but has some quality control issues."
+        }
+    
+    affiliate_tag = "veriqo-20"
+    affiliate_url = f"{amazon_url}?tag={affiliate_tag}" if "?" not in amazon_url else f"{amazon_url}&tag={affiliate_tag}"
+    
+    result["amazon_url"] = amazon_url
+    result["affiliate_url"] = affiliate_url
+    
+    return result
+
+async def scrape_amazon_product(url: str) -> dict:
+    """Scrape basic product info from Amazon"""
+    from bs4 import BeautifulSoup
+    import re
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+    }
+    
+    try:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=15.0) as client:
+            response = await client.get(url, headers=headers)
+            
+            if response.status_code != 200:
+                logging.warning(f"Amazon returned status {response.status_code}")
+                return {}
+            
+            soup = BeautifulSoup(response.text, 'lxml')
+            
+            # Extract product name
+            product_name = None
+            name_selectors = ['#productTitle', '#title', 'h1.a-size-large']
+            for selector in name_selectors:
+                elem = soup.select_one(selector)
+                if elem:
+                    product_name = elem.get_text(strip=True)
+                    break
+            
+            # Extract price
+            price = None
+            price_selectors = ['.a-price .a-offscreen', '#priceblock_ourprice', '#priceblock_dealprice', '.a-price-whole']
+            for selector in price_selectors:
+                elem = soup.select_one(selector)
+                if elem:
+                    price = elem.get_text(strip=True)
+                    break
+            
+            # Extract rating
+            rating = None
+            rating_elem = soup.select_one('.a-icon-star span.a-icon-alt, #acrPopover span.a-icon-alt')
+            if rating_elem:
+                rating = rating_elem.get_text(strip=True)
+            
+            # Extract review count
+            review_count = None
+            review_elem = soup.select_one('#acrCustomerReviewText')
+            if review_elem:
+                review_count = review_elem.get_text(strip=True)
+            
+            # Extract product image
+            product_image = None
+            img_elem = soup.select_one('#landingImage, #imgBlkFront')
+            if img_elem:
+                product_image = img_elem.get('src') or img_elem.get('data-old-hires')
+            
+            # Extract sample reviews from the product page
+            sample_reviews = []
+            review_elems = soup.select('.review-text-content span, .a-expander-content.reviewText')[:5]
+            for rev in review_elems:
+                text = rev.get_text(strip=True)
+                if text and len(text) > 20:
+                    sample_reviews.append(text[:300])
+            
+            return {
+                "product_name": product_name,
+                "price": price,
+                "rating": rating,
+                "review_count": review_count,
+                "product_image": product_image,
+                "sample_reviews": "\n".join(sample_reviews) if sample_reviews else ""
+            }
+            
+    except Exception as e:
+        logging.error(f"Amazon scrape error: {e}")
+        return {}
             "who_should_not_buy": ["Users seeking premium quality", "Those needing immediate delivery"],
             "summary": "Decent value but has some quality control issues."
         }
