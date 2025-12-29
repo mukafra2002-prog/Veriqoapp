@@ -2,6 +2,7 @@ import requests
 import sys
 import json
 from datetime import datetime
+import time
 
 class VeriqoAPITester:
     def __init__(self, base_url="https://smart-shopper-157.preview.emergentagent.com/api"):
@@ -10,6 +11,7 @@ class VeriqoAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.user_id = None
+        self.analysis_id = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
         """Run a single API test"""
