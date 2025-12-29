@@ -28,10 +28,10 @@ export default function LandingPage() {
               <span className="text-2xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Veriqo</span>
             </div>
             <div className="hidden md:flex items-center gap-8">
+              <Link to="/shoppers" className="text-slate-400 hover:text-white transition-colors">For Shoppers</Link>
+              <Link to="/sellers" className="text-slate-400 hover:text-white transition-colors">For Sellers</Link>
               <a href="#features" className="text-slate-400 hover:text-white transition-colors">Features</a>
-              <a href="#how-it-works" className="text-slate-400 hover:text-white transition-colors">How it Works</a>
               <a href="#pricing" className="text-slate-400 hover:text-white transition-colors">Pricing</a>
-              <a href="#enterprise" className="text-slate-400 hover:text-white transition-colors">Enterprise</a>
             </div>
             <div className="flex items-center gap-4">
               <Link to="/login">
