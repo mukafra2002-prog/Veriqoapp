@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Navbar } from '../components/Navbar';
 import { OnboardingModal } from '../components/OnboardingModal';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import axios from 'axios';
-import { Search, Loader2, History, ExternalLink, Shield, Clock, Sparkles } from 'lucide-react';
+import { Search, Loader2, History, ExternalLink, Shield, Clock, Sparkles, ChevronRight } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
@@ -155,9 +155,17 @@ export default function HomePage() {
 
         {/* Recent History */}
         <div>
-          <div className="flex items-center gap-2 mb-6">
-            <History className="w-5 h-5 text-slate-500" />
-            <h2 className="text-xl font-semibold text-white">Recent Analyses</h2>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <History className="w-5 h-5 text-slate-500" />
+              <h2 className="text-xl font-semibold text-white">Recent Analyses</h2>
+            </div>
+            {history.length > 0 && (
+              <Link to="/history" className="flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300 transition-colors">
+                View All
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
 
           {historyLoading ? (
