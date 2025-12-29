@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext(null);
@@ -8,30 +8,37 @@ const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('veriqo_token'));
+  const [token, setToken] = useState(() => localStorage.getItem('veriqo_token'));
+  const [authChecked, setAuthChecked] = useState(false);
 
-  useEffect(() => {
-    if (token) {
-      fetchUser();
-    } else {
-      setLoading(false);
-    }
-  }, [token]);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async (authToken) => {
     try {
       const response = await axios.get(`${API_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${authToken}` }
       });
       setUser(response.data);
+      return true;
     } catch (error) {
       localStorage.removeItem('veriqo_token');
       setToken(null);
       setUser(null);
-    } finally {
-      setLoading(false);
+      return false;
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem('veriqo_token');
+      if (storedToken) {
+        setToken(storedToken);
+        await fetchUser(storedToken);
+      }
+      setLoading(false);
+      setAuthChecked(true);
+    };
+    
+    initAuth();
+  }, [fetchUser]);
 
   const login = async (email, password) => {
     const response = await axios.post(`${API_URL}/auth/login`, { email, password });
