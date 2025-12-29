@@ -178,11 +178,14 @@ frontend:
     file: "/app/frontend/src/pages/HistoryPage.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "New History page created with stats, search, filters, and CSV export"
+      - working: true
+        agent: "testing"
+        comment: "TESTED: History page working correctly. All features verified: 1) Stats cards display properly (Total Analyses, Buy, Think, Avoid counts), 2) Search input field present and functional, 3) Filter buttons (All, BUY, THINK, AVOID) working, 4) Export CSV button present and correctly redirects free users to pricing page, 5) 'Analyze a Product' button appears when no analyses exist and redirects to /home, 6) Direct navigation to /history works with authentication."
 
   - task: "Session Persistence"
     implemented: true
