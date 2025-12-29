@@ -24,25 +24,25 @@ export const Navbar = () => {
     : `${user?.checks_remaining || 0}/${3}`;
 
   return (
-    <nav className="nav-glass sticky top-0 z-50" data-testid="navbar">
+    <nav className="border-b border-white/5 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50" data-testid="navbar">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/home" className="flex items-center gap-2" data-testid="navbar-logo">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25">
               <Zap className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-slate-900">Veriqo</span>
+            <span className="text-xl font-bold text-white">Veriqo</span>
           </Link>
 
           {/* Right Side */}
           <div className="flex items-center gap-4">
             {/* Usage Counter */}
-            <div className="usage-counter hidden sm:flex" data-testid="usage-counter">
-              <span className="count">{checksDisplay}</span>
-              <span>checks</span>
+            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm" data-testid="usage-counter">
+              <span className="text-blue-400 font-bold">{checksDisplay}</span>
+              <span className="text-slate-400">checks</span>
               {user?.subscription_type !== 'premium' && (
-                <Link to="/pricing" className="ml-2 text-blue-600 hover:text-blue-700 font-medium text-xs">
+                <Link to="/pricing" className="ml-2 text-emerald-400 hover:text-emerald-300 font-medium text-xs">
                   Upgrade
                 </Link>
               )}
@@ -50,7 +50,7 @@ export const Navbar = () => {
 
             {/* Premium Badge */}
             {user?.subscription_type === 'premium' && (
-              <div className="hidden sm:flex items-center gap-1 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm font-medium" data-testid="premium-badge">
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-full text-sm font-medium" data-testid="premium-badge">
                 <Crown className="w-4 h-4" />
                 Premium
               </div>
@@ -59,30 +59,34 @@ export const Navbar = () => {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-10 w-10 rounded-full" data-testid="user-menu-trigger">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-blue-600" />
+                <Button variant="ghost" className="h-10 w-10 rounded-full p-0 hover:bg-white/10" data-testid="user-menu-trigger">
+                  <div className="w-9 h-9 bg-gradient-to-br from-blue-500/20 to-emerald-500/20 border border-white/10 rounded-full flex items-center justify-center">
+                    {user?.picture ? (
+                      <img src={user.picture} alt="" className="w-full h-full rounded-full object-cover" />
+                    ) : (
+                      <User className="w-4 h-4 text-slate-400" />
+                    )}
                   </div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-56 bg-slate-900 border-white/10">
                 <div className="px-2 py-1.5">
-                  <p className="text-sm font-medium text-slate-900">{user?.name}</p>
-                  <p className="text-xs text-slate-500">{user?.email}</p>
+                  <p className="text-sm font-medium text-white">{user?.name}</p>
+                  <p className="text-xs text-slate-500">{user?.email || user?.phone}</p>
                 </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/account')} data-testid="menu-account">
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem onClick={() => navigate('/account')} className="text-slate-300 focus:bg-white/10 focus:text-white" data-testid="menu-account">
                   <Settings className="w-4 h-4 mr-2" />
                   Account Settings
                 </DropdownMenuItem>
                 {user?.subscription_type !== 'premium' && (
-                  <DropdownMenuItem onClick={() => navigate('/pricing')} data-testid="menu-upgrade">
+                  <DropdownMenuItem onClick={() => navigate('/pricing')} className="text-slate-300 focus:bg-white/10 focus:text-white" data-testid="menu-upgrade">
                     <Crown className="w-4 h-4 mr-2" />
                     Upgrade to Premium
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600" data-testid="menu-logout">
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-400 focus:bg-red-500/10 focus:text-red-400" data-testid="menu-logout">
                   <LogOut className="w-4 h-4 mr-2" />
                   Log out
                 </DropdownMenuItem>

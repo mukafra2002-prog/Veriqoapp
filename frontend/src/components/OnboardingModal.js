@@ -9,19 +9,19 @@ const steps = [
     icon: Link2,
     title: 'Paste Product Link',
     description: 'Copy any Amazon product URL and paste it into Veriqo',
-    color: 'bg-blue-100 text-blue-600'
+    color: 'bg-blue-500/20 text-blue-400'
   },
   {
     icon: CheckCircle,
     title: 'Get Buy / Think / Avoid',
     description: 'Our AI analyzes real reviews to give you a clear verdict',
-    color: 'bg-emerald-100 text-emerald-600'
+    color: 'bg-emerald-500/20 text-emerald-400'
   },
   {
     icon: Crown,
     title: 'Upgrade for Unlimited',
     description: '3 free checks per month. Go premium for unlimited access',
-    color: 'bg-amber-100 text-amber-600'
+    color: 'bg-amber-500/20 text-amber-400'
   }
 ];
 
@@ -49,14 +49,14 @@ export const OnboardingModal = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden" data-testid="onboarding-modal">
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-slate-900 border-white/10" data-testid="onboarding-modal">
         <DialogTitle className="sr-only">Welcome to Veriqo</DialogTitle>
         <DialogDescription className="sr-only">Learn how to use Veriqo to analyze Amazon products</DialogDescription>
         <div className="relative">
           {/* Skip Button */}
           <button
             onClick={handleSkip}
-            className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 transition-colors"
+            className="absolute top-4 right-4 p-1 text-slate-500 hover:text-white transition-colors z-10"
             data-testid="onboarding-skip"
           >
             <X className="w-5 h-5" />
@@ -70,7 +70,7 @@ export const OnboardingModal = ({ open, onClose }) => {
                 <div
                   key={idx}
                   className={`h-1.5 w-8 rounded-full transition-colors ${
-                    idx <= currentStep ? 'bg-blue-600' : 'bg-slate-200'
+                    idx <= currentStep ? 'bg-blue-500' : 'bg-slate-700'
                   }`}
                 />
               ))}
@@ -85,17 +85,17 @@ export const OnboardingModal = ({ open, onClose }) => {
                 })()}
               </div>
               
-              <h3 className="text-xl font-bold text-slate-900 mb-2">
+              <h3 className="text-xl font-bold text-white mb-2">
                 {steps[currentStep].title}
               </h3>
               
-              <p className="text-slate-600 mb-8">
+              <p className="text-slate-400 mb-8">
                 {steps[currentStep].description}
               </p>
 
               <Button
                 onClick={handleNext}
-                className="w-full h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                className="w-full h-12 rounded-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold"
                 data-testid="onboarding-next"
               >
                 {currentStep < steps.length - 1 ? (
