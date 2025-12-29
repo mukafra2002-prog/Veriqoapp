@@ -20,7 +20,8 @@ export default function HomePage() {
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
-    if (user && !user.onboarding_completed) {
+    // Only show onboarding for new users who haven't completed it
+    if (user && user.onboarding_completed === false) {
       setShowOnboarding(true);
     }
     fetchHistory();
