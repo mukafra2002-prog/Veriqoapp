@@ -172,6 +172,57 @@ class VeriqoAPITester:
         self.token = original_token
         return success
 
+    def test_forgot_password(self, email="test@example.com"):
+        """Test forgot password endpoint"""
+        success, response = self.run_test(
+            "Forgot Password",
+            "POST",
+            "auth/forgot-password",
+            200,
+            data={"email": email}
+        )
+        return success
+
+    def test_phone_send_otp(self, phone="+15551234567"):
+        """Test phone OTP send endpoint"""
+        success, response = self.run_test(
+            "Phone Send OTP",
+            "POST",
+            "auth/phone/send-otp",
+            200,
+            data={"phone_number": phone}
+        )
+        if success:
+            print(f"   OTP Status: {response.get('status', 'N/A')}")
+            print(f"   Message: {response.get('message', 'N/A')}")
+        return success
+
+    def test_phone_verify_otp(self, phone="+15551234567", code="123456"):
+        """Test phone OTP verify endpoint"""
+        success, response = self.run_test(
+            "Phone Verify OTP",
+            "POST",
+            "auth/phone/verify-otp",
+            200,
+            data={"phone_number": phone, "code": code}
+        )
+        if success and 'token' in response:
+            print(f"   Phone login successful")
+            print(f"   User: {response['user']['name']}")
+            return True, response['token']
+        return False, None
+
+    def test_google_session_invalid(self):
+        """Test Google OAuth session with invalid session ID"""
+        success, response = self.run_test(
+            "Google OAuth Invalid Session",
+            "POST",
+            "auth/google/session",
+            400,
+            data={"session_id": "invalid_session_id"}
+        )
+        return success
+
 def main():
     print("🚀 Starting Veriqo API Tests")
     print("=" * 50)
