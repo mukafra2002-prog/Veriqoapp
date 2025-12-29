@@ -3,7 +3,8 @@ import { Button } from '../components/ui/button';
 import { 
   Zap, Shield, Clock, ArrowRight, CheckCircle, Star, 
   Sparkles, TrendingUp, Users, Play, ChevronRight,
-  ShoppingBag, BadgeCheck, AlertTriangle
+  ShoppingBag, BadgeCheck, AlertTriangle, Building2,
+  BarChart3, Download, UserPlus, Crown
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -30,6 +31,7 @@ export default function LandingPage() {
               <a href="#features" className="text-slate-400 hover:text-white transition-colors">Features</a>
               <a href="#how-it-works" className="text-slate-400 hover:text-white transition-colors">How it Works</a>
               <a href="#pricing" className="text-slate-400 hover:text-white transition-colors">Pricing</a>
+              <a href="#enterprise" className="text-slate-400 hover:text-white transition-colors">Enterprise</a>
             </div>
             <div className="flex items-center gap-4">
               <Link to="/login">
@@ -54,12 +56,7 @@ export default function LandingPage() {
           {/* Trust Badge */}
           <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border border-blue-500/20 rounded-full text-sm mb-8 animate-fade-in">
             <Sparkles className="w-4 h-4 text-blue-400" />
-            <span className="text-slate-300">Trusted by <span className="text-white font-semibold">50,000+</span> smart shoppers</span>
-            <div className="flex -space-x-2">
-              {[1,2,3,4].map(i => (
-                <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 border-2 border-slate-900"></div>
-              ))}
-            </div>
+            <span className="text-slate-300">Trusted by <span className="text-white font-semibold">50,000+</span> shoppers & businesses</span>
           </div>
           
           {/* Main Headline */}
@@ -75,7 +72,7 @@ export default function LandingPage() {
           
           {/* Subheadline */}
           <p className="text-xl sm:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed animate-slide-up stagger-1">
-            Paste any Amazon link. Get instant AI analysis with a clear
+            AI-powered Amazon review analysis. Get instant
             <span className="inline-flex items-center mx-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-lg font-semibold">
               <CheckCircle className="w-4 h-4 mr-1.5" /> Buy
             </span>
@@ -85,7 +82,7 @@ export default function LandingPage() {
             <span className="inline-flex items-center mx-2 px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-lg font-semibold">
               <Shield className="w-4 h-4 mr-1.5" /> Avoid
             </span>
-            verdict.
+            verdicts.
           </p>
 
           {/* CTA Buttons */}
@@ -100,13 +97,15 @@ export default function LandingPage() {
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Button 
-              variant="outline" 
-              className="h-16 px-10 rounded-2xl border-2 border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold text-lg backdrop-blur-sm"
-            >
-              <Play className="w-5 h-5 mr-2" />
-              Watch Demo
-            </Button>
+            <a href="#enterprise">
+              <Button 
+                variant="outline" 
+                className="h-16 px-10 rounded-2xl border-2 border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold text-lg backdrop-blur-sm"
+              >
+                <Building2 className="w-5 h-5 mr-2" />
+                Enterprise Solutions
+              </Button>
+            </a>
           </div>
 
           <p className="text-slate-500 text-sm animate-fade-in stagger-3">
@@ -117,13 +116,9 @@ export default function LandingPage() {
         {/* Hero Visual - Mock Results Card */}
         <div className="max-w-4xl mx-auto mt-20 animate-slide-up stagger-4">
           <div className="relative">
-            {/* Glow Effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-emerald-600/20 blur-3xl"></div>
-            
-            {/* Card */}
             <div className="relative bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
               <div className="flex flex-col md:flex-row items-center gap-8">
-                {/* Score */}
                 <div className="flex flex-col items-center">
                   <div className="relative w-40 h-40">
                     <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
@@ -145,16 +140,13 @@ export default function LandingPage() {
                     <span className="text-emerald-400 font-bold uppercase tracking-wider">BUY</span>
                   </div>
                 </div>
-
-                {/* Details */}
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <BadgeCheck className="w-5 h-5 text-blue-400" />
                     <span className="text-sm text-slate-400">Verified by AI • Updated 2 min ago</span>
                   </div>
                   <h3 className="text-xl font-bold text-white mb-4">Sony WH-1000XM5 Wireless Headphones</h3>
-                  <p className="text-slate-400 mb-6">Exceptional noise cancellation and sound quality. Minor complaints about comfort during extended use and premium pricing.</p>
-                  
+                  <p className="text-slate-400 mb-6">Exceptional noise cancellation and sound quality. Minor complaints about comfort during extended use.</p>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
                       <span className="text-slate-300">Build Quality Concerns</span>
@@ -235,7 +227,6 @@ export default function LandingPage() {
               }
             ].map((item, idx) => (
               <div key={idx} className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-xl" style={{background: `linear-gradient(to bottom right, var(--tw-gradient-stops))`}}></div>
                 <div className="relative p-8 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur border border-white/5 rounded-3xl hover:border-white/10 transition-all group-hover:translate-y-[-4px]">
                   <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-lg`}>
                     {item.icon}
@@ -270,7 +261,9 @@ export default function LandingPage() {
                   { icon: CheckCircle, title: 'Real Review Analysis', desc: 'We analyze verified purchase reviews, filtering out fake ones' },
                   { icon: Clock, title: 'Instant Results', desc: 'Get your verdict in under 10 seconds, not minutes' },
                   { icon: Shield, title: 'Unbiased Insights', desc: 'No sponsorships or affiliate bias—just honest AI analysis' },
-                  { icon: Star, title: 'Top Complaints', desc: 'Know exactly what real buyers complain about most' }
+                  { icon: Star, title: 'Top Complaints', desc: 'Know exactly what real buyers complain about most' },
+                  { icon: Download, title: 'Export Data', desc: 'Download analysis reports in CSV format (Business plans)' },
+                  { icon: BarChart3, title: 'Analytics Dashboard', desc: 'Track trends and insights across products (Enterprise)' }
                 ].map((feature, idx) => (
                   <div key={idx} className="flex gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors group">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-emerald-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -312,58 +305,139 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Preview */}
+      {/* Pricing Section */}
       <section id="pricing" className="relative py-24 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm mb-4">
-            <Star className="w-4 h-4" />
-            Simple Pricing
-          </span>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Start free, upgrade when ready
-          </h2>
-          <p className="text-xl text-slate-400 mb-12">
-            3 free analyses per month. Go premium for unlimited access.
-          </p>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm mb-4">
+              <Crown className="w-4 h-4" />
+              Simple Pricing
+            </span>
+            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+              Plans for everyone
+            </h2>
+            <p className="text-xl text-slate-400">
+              From individual shoppers to enterprise teams
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-            <div className="p-8 bg-slate-800/50 border border-white/5 rounded-3xl text-left">
-              <h3 className="text-xl font-bold text-white mb-2">Free</h3>
-              <div className="text-4xl font-bold text-white mb-6">$0<span className="text-lg text-slate-500">/mo</span></div>
-              <ul className="space-y-3 mb-8">
-                {['3 analyses per month', 'AI-powered insights', 'Top complaints view'].map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-slate-400">
-                    <CheckCircle className="w-5 h-5 text-emerald-400" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Link to="/register">
-                <Button variant="outline" className="w-full h-12 rounded-xl border-white/10 text-white hover:bg-white/5">
-                  Get Started
-                </Button>
-              </Link>
-            </div>
-            <div className="relative p-8 bg-gradient-to-br from-blue-600/20 to-emerald-600/20 border border-blue-500/30 rounded-3xl text-left">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-full text-white text-sm font-semibold">
-                Most Popular
+          {/* Shopper Plans */}
+          <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <ShoppingBag className="w-6 h-6 text-blue-400" />
+            For Shoppers
+          </h3>
+          <div className="grid md:grid-cols-2 gap-6 mb-16 max-w-3xl">
+            {[
+              {
+                name: 'Free',
+                price: '0',
+                period: '/month',
+                description: 'Perfect for casual shoppers',
+                features: ['3 product checks per month', 'Buy/Think/Avoid verdict', 'Top complaints view', 'Basic support'],
+                popular: false,
+                cta: 'Get Started'
+              },
+              {
+                name: 'Premium',
+                price: '6.99',
+                period: '/month',
+                description: 'For power shoppers',
+                features: ['Unlimited product checks', 'Save analysis history', 'Priority AI processing', 'Email support', 'No ads'],
+                popular: true,
+                cta: 'Start Free Trial'
+              }
+            ].map((plan, idx) => (
+              <div key={idx} className={`relative p-6 rounded-2xl border transition-all ${plan.popular ? 'bg-gradient-to-br from-blue-600/20 to-emerald-600/20 border-blue-500/30' : 'bg-white/5 border-white/10'}`}>
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-full text-white text-xs font-semibold">
+                    MOST POPULAR
+                  </div>
+                )}
+                <h4 className="text-xl font-bold text-white mb-2">{plan.name}</h4>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-4xl font-bold text-white">${plan.price}</span>
+                  <span className="text-slate-400">{plan.period}</span>
+                </div>
+                <p className="text-sm text-slate-400 mb-4">{plan.description}</p>
+                <ul className="space-y-2 mb-6">
+                  {plan.features.map((feature, fidx) => (
+                    <li key={fidx} className="flex items-center gap-2 text-sm text-slate-300">
+                      <CheckCircle className="w-4 h-4 text-emerald-400" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/register">
+                  <Button className={`w-full h-11 rounded-xl font-semibold ${plan.popular ? 'bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white' : 'bg-white/10 hover:bg-white/20 text-white'}`}>
+                    {plan.cta}
+                  </Button>
+                </Link>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Premium</h3>
-              <div className="text-4xl font-bold text-white mb-6">$6.99<span className="text-lg text-slate-400">/mo</span></div>
-              <ul className="space-y-3 mb-8">
-                {['Unlimited analyses', 'Priority AI processing', 'Save & compare products', 'Email support'].map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-slate-300">
-                    <CheckCircle className="w-5 h-5 text-emerald-400" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Link to="/register">
-                <Button className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold">
-                  Start Free Trial
-                </Button>
-              </Link>
-            </div>
+            ))}
+          </div>
+
+          {/* Business Plans */}
+          <h3 id="enterprise" className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <Building2 className="w-6 h-6 text-purple-400" />
+            For Business
+          </h3>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                name: 'Starter',
+                price: '29',
+                period: '/month',
+                description: 'For small teams',
+                features: ['100 checks per month', 'Team dashboard', '3 team members', 'Basic analytics', 'Email support'],
+                popular: false,
+                cta: 'Start Trial'
+              },
+              {
+                name: 'Pro',
+                price: '99',
+                period: '/month',
+                description: 'For growing businesses',
+                features: ['500 checks per month', 'Unlimited team members', 'CSV export', 'Advanced analytics', 'Priority support', 'Campaign management'],
+                popular: true,
+                cta: 'Start Trial'
+              },
+              {
+                name: 'Enterprise',
+                price: 'Custom',
+                period: '',
+                description: 'For large organizations',
+                features: ['Unlimited checks', 'API access', 'Custom integrations', 'Dedicated account manager', 'Advanced analytics', 'SLA guarantee'],
+                popular: false,
+                cta: 'Contact Sales'
+              }
+            ].map((plan, idx) => (
+              <div key={idx} className={`relative p-6 rounded-2xl border transition-all ${plan.popular ? 'bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-purple-500/30' : 'bg-white/5 border-white/10'}`}>
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white text-xs font-semibold">
+                    BEST VALUE
+                  </div>
+                )}
+                <h4 className="text-xl font-bold text-white mb-2">{plan.name}</h4>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-4xl font-bold text-white">{plan.price === 'Custom' ? '' : '$'}{plan.price}</span>
+                  <span className="text-slate-400">{plan.period}</span>
+                </div>
+                <p className="text-sm text-slate-400 mb-4">{plan.description}</p>
+                <ul className="space-y-2 mb-6">
+                  {plan.features.map((feature, fidx) => (
+                    <li key={fidx} className="flex items-center gap-2 text-sm text-slate-300">
+                      <CheckCircle className="w-4 h-4 text-purple-400" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link to={plan.name === 'Enterprise' ? '#' : '/register'}>
+                  <Button className={`w-full h-11 rounded-xl font-semibold ${plan.popular ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white' : 'bg-white/10 hover:bg-white/20 text-white'}`}>
+                    {plan.cta}
+                  </Button>
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -379,7 +453,7 @@ export default function LandingPage() {
                 Ready to shop smarter?
               </h2>
               <p className="text-xl text-white/80 mb-8 max-w-xl mx-auto">
-                Join 50,000+ shoppers making confident purchase decisions with Veriqo.
+                Join 50,000+ shoppers and businesses making confident purchase decisions with Veriqo.
               </p>
               <Link to="/register">
                 <Button 
@@ -410,12 +484,11 @@ export default function LandingPage() {
           <div className="flex items-center gap-6">
             <a href="#" className="text-slate-500 hover:text-white transition-colors text-sm">Privacy</a>
             <a href="#" className="text-slate-500 hover:text-white transition-colors text-sm">Terms</a>
-            <a href="#" className="text-slate-500 hover:text-white transition-colors text-sm">Contact</a>
+            <a href="mailto:support@veriqoapp.com" className="text-slate-500 hover:text-white transition-colors text-sm">Contact</a>
           </div>
         </div>
       </footer>
 
-      {/* CSS for animations */}
       <style>{`
         @keyframes gradient {
           0%, 100% { background-position: 0% 50%; }
