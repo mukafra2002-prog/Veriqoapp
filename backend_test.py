@@ -240,6 +240,10 @@ def main():
         ("Get Analysis History", tester.test_get_history),
         ("Invalid Amazon URL", tester.test_invalid_amazon_url),
         ("Unauthorized Access", tester.test_unauthorized_access),
+        ("Forgot Password", tester.test_forgot_password),
+        ("Phone Send OTP", tester.test_phone_send_otp),
+        ("Phone Verify OTP", lambda: tester.test_phone_verify_otp()[0]),
+        ("Google OAuth Invalid", tester.test_google_session_invalid),
     ]
     
     # Run tests
