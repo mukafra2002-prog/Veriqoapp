@@ -789,6 +789,32 @@ async def export_history(user: dict = Depends(get_current_user)):
         headers={"Content-Disposition": f"attachment; filename=veriqo-history-{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.csv"}
     )
 
+# ==================== PUBLIC INSIGHTS ROUTES ====================
+
+@api_router.get("/insights", response_model=List[ProductAnalysisResponse])
+async def get_public_insights(limit: int = 50):
+    """Get list of public product insights for SEO pages. No auth required."""
+    # Get analyses marked as public or all analyses (for demo purposes)
+    analyses = await db.product_analyses.find(
+        {"is_public": {"$ne": False}},  # Include if not explicitly set to False
+        {"_id": 0}
+    ).sort("analyzed_at", -1).limit(limit).to_list(limit)
+    
+    return analyses
+
+@api_router.get("/insights/{product_id}", response_model=ProductAnalysisResponse)
+async def get_public_insight(product_id: str):
+    """Get a single public product insight. No auth required."""
+    analysis = await db.product_analyses.find_one(
+        {"id": product_id, "is_public": {"$ne": False}},
+        {"_id": 0}
+    )
+    
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Product insight not found")
+    
+    return analysis
+
 # ==================== PAYMENT ROUTES ====================
 
 @api_router.post("/payments/checkout", response_model=CheckoutResponse)
