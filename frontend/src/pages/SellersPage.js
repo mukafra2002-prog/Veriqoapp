@@ -95,20 +95,24 @@ export default function SellersPage() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
             <h3 className="text-2xl font-bold text-white mb-6 text-center">
-              Know What Customers Hate About Your Competitors
+              Turn Customer Feedback Into Competitive Advantage
             </h3>
+            <p className="text-slate-400 text-center mb-8 max-w-2xl mx-auto">
+              By transforming thousands of reviews into clear insights, VERIQO shows where 
+              expectations don't match real usage and which buyers a product is best suited for.
+            </p>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="text-4xl font-bold text-purple-400 mb-2">78%</div>
-                <p className="text-slate-400 text-sm">of purchase decisions influenced by negative reviews</p>
+                <div className="text-4xl font-bold text-purple-400 mb-2">↓ Returns</div>
+                <p className="text-slate-400 text-sm">Understand customer expectations before they buy</p>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-pink-400 mb-2">5 min</div>
-                <p className="text-slate-400 text-sm">to analyze what takes hours manually</p>
+                <div className="text-4xl font-bold text-pink-400 mb-2">↑ Listings</div>
+                <p className="text-slate-400 text-sm">Optimize based on real customer feedback</p>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-blue-400 mb-2">3x</div>
-                <p className="text-slate-400 text-sm">faster product improvement cycle</p>
+                <div className="text-4xl font-bold text-blue-400 mb-2">0 Risk</div>
+                <p className="text-slate-400 text-sm">No risk to account health or compliance</p>
               </div>
             </div>
           </div>
