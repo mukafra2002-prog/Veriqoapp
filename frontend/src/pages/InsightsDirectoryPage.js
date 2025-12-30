@@ -118,19 +118,17 @@ export default function InsightsDirectoryPage() {
 
       {/* Insights Grid */}
       <main className="py-12 px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
             </div>
-          ) : filteredInsights.length === 0 ? (
+          ) : insights.length === 0 ? (
             <div className="text-center py-20">
               <ShoppingBag className="w-16 h-16 text-slate-700 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">No insights found</h3>
+              <h3 className="text-xl font-semibold text-white mb-2">No insights available</h3>
               <p className="text-slate-400 mb-6">
-                {searchQuery || filterVerdict !== 'all' 
-                  ? 'Try adjusting your search or filters' 
-                  : 'Be the first to analyze a product!'}
+                Be the first to analyze a product!
               </p>
               <Link to="/register">
                 <Button className="bg-gradient-to-r from-blue-600 to-emerald-600">
@@ -139,61 +137,88 @@ export default function InsightsDirectoryPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredInsights.map((insight) => (
+            <>
+              {/* Single Featured Product */}
+              {insights.map((insight) => (
                 <Link
                   key={insight.id}
                   to={`/insights/${insight.id}`}
-                  className="group"
+                  className="group block"
                 >
-                  <article className="bg-slate-800/50 border border-white/5 rounded-2xl overflow-hidden hover:border-white/10 hover:bg-slate-800/70 transition-all h-full">
-                    {/* Product Image */}
-                    <div className="aspect-video bg-white p-4 flex items-center justify-center">
-                      {insight.product_image ? (
-                        <img 
-                          src={insight.product_image} 
-                          alt={insight.product_name}
-                          className="max-h-full object-contain"
-                        />
-                      ) : (
-                        <ShoppingBag className="w-12 h-12 text-slate-300" />
-                      )}
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="p-5">
-                      {/* Verdict Badge */}
-                      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border mb-3 ${getVerdictStyles(insight.verdict)}`}>
-                        {getVerdictIcon(insight.verdict)}
-                        {insight.verdict}
+                  <article className="bg-slate-800/50 border border-white/5 rounded-2xl overflow-hidden hover:border-blue-500/30 hover:bg-slate-800/70 transition-all">
+                    <div className="flex flex-col md:flex-row">
+                      {/* Product Image */}
+                      <div className="md:w-64 h-48 md:h-auto bg-white p-4 flex items-center justify-center flex-shrink-0">
+                        {insight.product_image ? (
+                          <img 
+                            src={insight.product_image} 
+                            alt={insight.product_name}
+                            className="max-h-full object-contain"
+                          />
+                        ) : (
+                          <ShoppingBag className="w-16 h-16 text-slate-300" />
+                        )}
                       </div>
                       
-                      {/* Product Name */}
-                      <h2 className="font-semibold text-white mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
-                        {insight.product_name}
-                      </h2>
-                      
-                      {/* Summary */}
-                      <p className="text-slate-400 text-sm line-clamp-2 mb-4">
-                        {insight.summary}
-                      </p>
-                      
-                      {/* Meta */}
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-500 flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {new Date(insight.analyzed_at).toLocaleDateString()}
-                        </span>
-                        <span className="text-blue-400 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                          Read More
-                          <ArrowRight className="w-4 h-4" />
-                        </span>
+                      {/* Content */}
+                      <div className="p-6 flex-1">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full">
+                            FEATURED INSIGHT
+                          </span>
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${getVerdictStyles(insight.verdict)}`}>
+                            {getVerdictIcon(insight.verdict)}
+                            {insight.verdict}
+                          </span>
+                        </div>
+                        
+                        {/* Product Name */}
+                        <h2 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                          {insight.product_name}
+                        </h2>
+                        
+                        {/* Summary */}
+                        <p className="text-slate-400 text-sm mb-4 line-clamp-3">
+                          {insight.summary}
+                        </p>
+                        
+                        {/* Meta */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500 text-sm flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            {new Date(insight.analyzed_at).toLocaleDateString()}
+                          </span>
+                          <span className="text-blue-400 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                            View Full Analysis
+                            <ArrowRight className="w-4 h-4" />
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </article>
                 </Link>
               ))}
-            </div>
+
+              {/* Unlock More CTA */}
+              <div className="mt-8 p-8 bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-white/10 rounded-2xl text-center">
+                <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-blue-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Want to Analyze More Products?
+                </h3>
+                <p className="text-slate-400 mb-6 max-w-md mx-auto">
+                  Sign up for free and get 3 product analyses per month. 
+                  Analyze any Amazon product instantly.
+                </p>
+                <Link to="/register">
+                  <Button className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold px-8 h-12">
+                    Get 3 Free Analyses
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </main>
