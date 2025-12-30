@@ -15,6 +15,8 @@ import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import HistoryPage from "./pages/HistoryPage";
 import ShoppersPage from "./pages/ShoppersPage";
 import SellersPage from "./pages/SellersPage";
+import PublicInsightPage from "./pages/PublicInsightPage";
+import InsightsDirectoryPage from "./pages/InsightsDirectoryPage";
 import "./App.css";
 
 // Protected Route Component
