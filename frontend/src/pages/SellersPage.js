@@ -125,13 +125,13 @@ export default function SellersPage() {
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-400 text-sm mb-4">
               <Target className="w-4 h-4" />
-              Competitor Analysis
+              How It Works
             </span>
             <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-              Turn Competitor Weaknesses Into Your Strengths
+              Optimize Listings, Target the Right Customers
             </h2>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Discover exactly what customers complain about in competing products
+              Improve long-term performance with AI-powered review intelligence
             </p>
           </div>
 
@@ -141,13 +141,13 @@ export default function SellersPage() {
               <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
                 <Search className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Instant Competitor Scan</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Aggregated Feedback Analysis</h3>
               <p className="text-slate-400 mb-6">
-                Paste any competitor's Amazon product link and get instant analysis of their reviews. 
-                See their top complaints ranked by frequency.
+                Transform thousands of customer reviews into actionable insights. 
+                Understand what buyers really think about your products.
               </p>
               <ul className="space-y-2">
-                {['Top 3 customer complaints', 'Complaint frequency percentages', 'Overall sentiment score'].map((item, idx) => (
+                {['Customer expectations analysis', 'Pain point identification', 'Feature sentiment breakdown'].map((item, idx) => (
                   <li key={idx} className="flex items-center gap-2 text-slate-300 text-sm">
                     <CheckCircle className="w-4 h-4 text-purple-400" />
                     {item}
@@ -161,13 +161,13 @@ export default function SellersPage() {
               <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
                 <AlertTriangle className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Weakness Identification</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Expectation Gap Detection</h3>
               <p className="text-slate-400 mb-6">
-                Our AI identifies specific product weaknesses that matter most to buyers. 
-                Know exactly where competitors are failing.
+                See where customer expectations don't match real product usage. 
+                Fix listing issues before they lead to returns.
               </p>
               <ul className="space-y-2">
-                {['Quality issues breakdown', 'Feature gaps identified', 'Service complaints tracked'].map((item, idx) => (
+                {['Listing vs reality comparison', 'Return reason analysis', 'Messaging improvement tips'].map((item, idx) => (
                   <li key={idx} className="flex items-center gap-2 text-slate-300 text-sm">
                     <CheckCircle className="w-4 h-4 text-blue-400" />
                     {item}
@@ -179,15 +179,15 @@ export default function SellersPage() {
             {/* Feature 3 */}
             <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur border border-white/5 rounded-3xl p-8 hover:border-purple-500/30 transition-all">
               <div className="w-14 h-14 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                <TrendingUp className="w-7 h-7 text-white" />
+                <Users className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Market Opportunity Finder</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Ideal Customer Profiling</h3>
               <p className="text-slate-400 mb-6">
-                The "Who Should NOT Buy" section reveals unserved customer segments. 
-                Find opportunities your competitors are missing.
+                Discover which buyers your product is best suited for. 
+                Target the right customers and reduce negative reviews.
               </p>
               <ul className="space-y-2">
-                {['Unserved customer profiles', 'Feature request patterns', 'Price sensitivity insights'].map((item, idx) => (
+                {['Best-fit customer profiles', 'Use case identification', 'Target audience insights'].map((item, idx) => (
                   <li key={idx} className="flex items-center gap-2 text-slate-300 text-sm">
                     <CheckCircle className="w-4 h-4 text-emerald-400" />
                     {item}
@@ -199,15 +199,15 @@ export default function SellersPage() {
             {/* Feature 4 */}
             <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur border border-white/5 rounded-3xl p-8 hover:border-purple-500/30 transition-all">
               <div className="w-14 h-14 bg-gradient-to-br from-amber-600 to-orange-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                <FileText className="w-7 h-7 text-white" />
+                <Shield className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Export & Report</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Compliance Safe</h3>
               <p className="text-slate-400 mb-6">
-                Download comprehensive CSV reports of competitor analyses. 
-                Share insights with your team and track changes over time.
+                Our analysis methods are 100% compliant with Amazon's terms. 
+                No risk to your account health or seller status.
               </p>
               <ul className="space-y-2">
-                {['CSV export for all analyses', 'Historical tracking', 'Team sharing (Business Pro)'].map((item, idx) => (
+                {['TOS compliant analysis', 'No account risk', 'Safe marketplace practices'].map((item, idx) => (
                   <li key={idx} className="flex items-center gap-2 text-slate-300 text-sm">
                     <CheckCircle className="w-4 h-4 text-amber-400" />
                     {item}
