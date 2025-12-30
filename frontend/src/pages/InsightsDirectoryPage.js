@@ -56,13 +56,6 @@ export default function InsightsDirectoryPage() {
     }
   };
 
-  // Filter insights
-  const filteredInsights = insights.filter(insight => {
-    const matchesSearch = insight.product_name?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterVerdict === 'all' || insight.verdict?.toUpperCase() === filterVerdict;
-    return matchesSearch && matchesFilter;
-  });
-
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <Helmet>
