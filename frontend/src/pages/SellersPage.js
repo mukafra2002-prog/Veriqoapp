@@ -340,10 +340,10 @@ export default function SellersPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"></div>
             <div className="relative px-8 py-16 text-center">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Ready to Outperform Your Competitors?
+                Ready to Improve Your Performance?
               </h2>
               <p className="text-xl text-white/80 mb-8 max-w-xl mx-auto">
-                Start analyzing competitor weaknesses today and turn insights into sales.
+                Start understanding your customers better and optimize your listings for long-term success.
               </p>
               <Link to="/register">
                 <Button className="h-14 px-10 rounded-2xl bg-white text-slate-900 hover:bg-slate-100 font-semibold text-lg">
