@@ -81,6 +81,8 @@ function AppRouter() {
       <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
       <Route path="/shoppers" element={<ShoppersPage />} />
       <Route path="/sellers" element={<SellersPage />} />
+      <Route path="/insights" element={<InsightsDirectoryPage />} />
+      <Route path="/insights/:productId" element={<PublicInsightPage />} />
       <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
       <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
