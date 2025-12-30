@@ -58,17 +58,18 @@ export default function SellersPage() {
           
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8">
             <span className="bg-gradient-to-r from-white via-white to-slate-400 bg-clip-text text-transparent">
-              Outsmart Your
+              Understand Your
             </span>
             <br />
             <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-              Competition
+              Customers Better
             </span>
           </h1>
           
           <p className="text-xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Analyze competitor products to discover their weaknesses. Find gaps in the market 
-            and opportunities to win more customers with AI-powered review intelligence.
+            VERIQO helps Amazon sellers understand customer expectations, reduce returns, and 
+            improve product listings using aggregated customer feedback. Transform thousands of 
+            reviews into clear insights—without risk to account health or marketplace compliance.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -77,14 +78,14 @@ export default function SellersPage() {
                 className="h-16 px-10 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold text-lg shadow-2xl shadow-purple-500/25 transition-all hover:scale-105"
               >
                 <Crosshair className="w-5 h-5 mr-2" />
-                Start Competitor Analysis
+                Start Analyzing Reviews
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
           </div>
           
           <p className="text-slate-500 text-sm">
-            Business plans start at $29/month • 100 competitor checks included
+            Business plans start at $29/month • 100 product checks included
           </p>
         </div>
       </section>
