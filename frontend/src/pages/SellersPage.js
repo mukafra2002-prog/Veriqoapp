@@ -228,7 +228,7 @@ export default function SellersPage() {
               Use Cases
             </span>
             <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-              How Sellers Use Veriqo
+              How Sellers Use VERIQO
             </h2>
           </div>
 
@@ -236,21 +236,21 @@ export default function SellersPage() {
             {[
               {
                 icon: Eye,
-                title: 'Product Research',
-                desc: 'Before launching a new product, analyze top competitors to understand market pain points.',
-                example: 'Research 10 competitors → Find common complaints → Design better product'
+                title: 'Reduce Returns',
+                desc: 'Understand why customers return products and fix listing issues before they cause problems.',
+                example: 'Analyze returns → Identify expectation gaps → Update listing copy'
               },
               {
                 icon: Award,
-                title: 'Listing Optimization',
-                desc: 'Address competitor weaknesses in your product descriptions and A+ content.',
-                example: 'Competitor has "battery" complaints → Highlight your "48hr battery life"'
+                title: 'Optimize Listings',
+                desc: 'Improve product descriptions based on actual customer feedback and pain points.',
+                example: 'Review complaints → Highlight strengths → Address concerns upfront'
               },
               {
                 icon: PieChart,
-                title: 'Market Positioning',
-                desc: 'Find the customer segments competitors are failing to serve.',
-                example: '"Not for heavy users" → Target heavy users with your premium option'
+                title: 'Target Right Buyers',
+                desc: 'Find the customers who will love your product and reduce negative reviews.',
+                example: '"Not for heavy users" → Target casual users → Better reviews'
               }
             ].map((item, idx) => (
               <div key={idx} className="p-6 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 hover:border-purple-500/30 transition-all">
