@@ -221,24 +221,6 @@ export default function InsightsDirectoryPage() {
         </div>
       </main>
 
-      {/* CTA */}
-      <section className="py-16 px-4 bg-gradient-to-b from-transparent via-blue-950/20 to-transparent">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Don't See Your Product?
-          </h2>
-          <p className="text-xl text-slate-400 mb-8">
-            Analyze any Amazon product instantly with Veriqo. 3 free checks per month.
-          </p>
-          <Link to="/register">
-            <Button className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-semibold px-8 h-12">
-              Start Free Analysis
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="border-t border-white/5 py-8">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
