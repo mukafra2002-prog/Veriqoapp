@@ -792,28 +792,33 @@ async def export_history(user: dict = Depends(get_current_user)):
 # ==================== PUBLIC INSIGHTS ROUTES ====================
 
 @api_router.get("/insights", response_model=List[ProductAnalysisResponse])
-async def get_public_insights(limit: int = 50):
-    """Get list of public product insights for SEO pages. No auth required."""
-    # Get analyses marked as public or all analyses (for demo purposes)
+async def get_public_insights():
+    """Get list of public product insights for SEO pages. Limited to 1 product for free access."""
+    # Only return 1 product insight publicly to encourage sign-ups
     analyses = await db.product_analyses.find(
-        {"is_public": {"$ne": False}},  # Include if not explicitly set to False
+        {"is_public": {"$ne": False}},
         {"_id": 0}
-    ).sort("analyzed_at", -1).limit(limit).to_list(limit)
+    ).sort("analyzed_at", -1).limit(1).to_list(1)
     
     return analyses
 
 @api_router.get("/insights/{product_id}", response_model=ProductAnalysisResponse)
 async def get_public_insight(product_id: str):
     """Get a single public product insight. No auth required."""
-    analysis = await db.product_analyses.find_one(
-        {"id": product_id, "is_public": {"$ne": False}},
-        {"_id": 0}
+    # First check if this is the most recent public insight (the only one allowed)
+    latest_insight = await db.product_analyses.find_one(
+        {"is_public": {"$ne": False}},
+        {"_id": 0},
+        sort=[("analyzed_at", -1)]
     )
     
-    if not analysis:
-        raise HTTPException(status_code=404, detail="Product insight not found")
+    if not latest_insight or latest_insight.get("id") != product_id:
+        raise HTTPException(
+            status_code=403, 
+            detail="Sign up for free to view more product insights"
+        )
     
-    return analysis
+    return latest_insight
 
 # ==================== PAYMENT ROUTES ====================
 
