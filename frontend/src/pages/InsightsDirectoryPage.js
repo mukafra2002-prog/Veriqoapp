@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button';
 import { 
   Zap, CheckCircle, AlertTriangle, XCircle, 
   Search, ShoppingBag, ArrowRight, Loader2,
-  TrendingUp, Clock, Filter
+  TrendingUp, Clock
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
@@ -14,8 +14,6 @@ const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 export default function InsightsDirectoryPage() {
   const [insights, setInsights] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterVerdict, setFilterVerdict] = useState('all');
 
   useEffect(() => {
     fetchInsights();
