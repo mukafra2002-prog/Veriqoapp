@@ -113,38 +113,8 @@ export default function InsightsDirectoryPage() {
         </div>
       </section>
 
-      {/* Search & Filter */}
-      <section className="py-8 px-4 border-b border-white/5">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-              />
-            </div>
-            <div className="flex gap-2">
-              {['all', 'BUY', 'THINK', 'AVOID'].map((filter) => (
-                <Button
-                  key={filter}
-                  onClick={() => setFilterVerdict(filter)}
-                  variant={filterVerdict === filter ? 'default' : 'outline'}
-                  className={filterVerdict === filter 
-                    ? 'bg-blue-600 hover:bg-blue-500 text-white' 
-                    : 'border-white/10 text-slate-400 hover:text-white hover:bg-white/5'
-                  }
-                >
-                  {filter === 'all' ? 'All' : filter}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Search & Filter - Hidden since only 1 product */}
+      {/* Removed search and filter since we only show 1 product */}
 
       {/* Insights Grid */}
       <main className="py-12 px-4">
