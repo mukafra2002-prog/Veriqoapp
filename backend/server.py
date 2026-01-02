@@ -595,7 +595,10 @@ async def analyze_product(data: ProductAnalysisRequest, user: dict = Depends(get
         raise HTTPException(status_code=400, detail="Please provide a valid Amazon product URL")
     
     try:
-        analysis = await perform_ai_analysis(data.amazon_url)
+        # Pass user_id for rate limiting and usage tracking
+        analysis = await perform_ai_analysis(data.amazon_url, user_id=user["id"])
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"AI Analysis error: {e}")
         raise HTTPException(status_code=500, detail="Failed to analyze product. Please try again.")
