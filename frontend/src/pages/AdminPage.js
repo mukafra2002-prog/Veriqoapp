@@ -204,6 +204,7 @@ export default function AdminPage() {
             { id: 'overview', label: 'Overview', icon: BarChart3 },
             { id: 'users', label: 'Users', icon: Users },
             { id: 'analyses', label: 'Analyses', icon: ShoppingBag },
+            { id: 'ai-controls', label: 'AI Controls', icon: Bot },
           ].map((tab) => (
             <Button
               key={tab.id}
