@@ -230,6 +230,65 @@ export default function ResultsPage() {
               ))}
             </div>
           </div>
+
+          {/* Review Authenticity Score */}
+          {analysis.authenticity_score && (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="authenticity-card">
+              <div className="flex items-center gap-2 mb-4">
+                <ShieldCheck className="w-5 h-5 text-blue-400" />
+                <h2 className="text-lg font-semibold text-white">Review Authenticity</h2>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="relative w-24 h-24">
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-slate-700" strokeWidth="8"/>
+                    <circle 
+                      cx="50" cy="50" r="42" fill="none" 
+                      stroke={analysis.authenticity_score >= 70 ? '#10B981' : analysis.authenticity_score >= 40 ? '#F59E0B' : '#EF4444'} 
+                      strokeWidth="8" strokeLinecap="round" 
+                      strokeDasharray="264" 
+                      strokeDashoffset={264 - (264 * analysis.authenticity_score / 100)}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-white">{analysis.authenticity_score}%</span>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <p className={`font-semibold ${getAuthenticityLabel(analysis.authenticity_score).color}`}>
+                    {getAuthenticityLabel(analysis.authenticity_score).label}
+                  </p>
+                  <p className="text-slate-400 text-sm mt-1">
+                    Our AI analyzes review patterns, language, and timing to detect potential fake or incentivized reviews.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Alternative Suggestions */}
+          {analysis.alternatives && analysis.alternatives.length > 0 && (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="alternatives-card">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-purple-400" />
+                <h2 className="text-lg font-semibold text-white">Consider These Alternatives</h2>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {analysis.alternatives.map((alt, idx) => (
+                  <div 
+                    key={idx}
+                    className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-xl"
+                  >
+                    <h3 className="font-semibold text-white mb-1">{alt.name}</h3>
+                    <p className="text-slate-400 text-sm">{alt.reason}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-slate-500 text-xs mt-4">
+                Search Amazon for these alternatives to find products with better reviews.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
