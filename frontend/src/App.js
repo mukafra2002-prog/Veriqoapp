@@ -20,6 +20,8 @@ import InsightsDirectoryPage from "./pages/InsightsDirectoryPage";
 import WishlistPage from "./pages/WishlistPage";
 import ComparePage from "./pages/ComparePage";
 import AdminPage from "./pages/AdminPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import TermsPage from "./pages/TermsPage";
 import "./App.css";
 
 // Protected Route Component
