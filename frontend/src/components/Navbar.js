@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import { User, Settings, LogOut, Crown, Zap } from 'lucide-react';
+import { User, Settings, LogOut, Crown, Zap, Heart, GitCompare, History } from 'lucide-react';
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
@@ -34,6 +34,28 @@ export const Navbar = () => {
             </div>
             <span className="text-xl font-bold text-white">Veriqo</span>
           </Link>
+
+          {/* Center Navigation */}
+          <div className="hidden md:flex items-center gap-1">
+            <Link to="/compare">
+              <Button variant="ghost" className="text-slate-400 hover:text-white hover:bg-white/10">
+                <GitCompare className="w-4 h-4 mr-2" />
+                Compare
+              </Button>
+            </Link>
+            <Link to="/wishlist">
+              <Button variant="ghost" className="text-slate-400 hover:text-white hover:bg-white/10">
+                <Heart className="w-4 h-4 mr-2" />
+                Wishlist
+              </Button>
+            </Link>
+            <Link to="/history">
+              <Button variant="ghost" className="text-slate-400 hover:text-white hover:bg-white/10">
+                <History className="w-4 h-4 mr-2" />
+                History
+              </Button>
+            </Link>
+          </div>
 
           {/* Right Side */}
           <div className="flex items-center gap-4">
@@ -75,6 +97,22 @@ export const Navbar = () => {
                   <p className="text-xs text-slate-500">{user?.email || user?.phone}</p>
                 </div>
                 <DropdownMenuSeparator className="bg-white/10" />
+                {/* Mobile Navigation Links */}
+                <div className="md:hidden">
+                  <DropdownMenuItem onClick={() => navigate('/compare')} className="text-slate-300 focus:bg-white/10 focus:text-white">
+                    <GitCompare className="w-4 h-4 mr-2" />
+                    Compare Products
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/wishlist')} className="text-slate-300 focus:bg-white/10 focus:text-white">
+                    <Heart className="w-4 h-4 mr-2" />
+                    My Wishlist
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/history')} className="text-slate-300 focus:bg-white/10 focus:text-white">
+                    <History className="w-4 h-4 mr-2" />
+                    History
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/10" />
+                </div>
                 <DropdownMenuItem onClick={() => navigate('/account')} className="text-slate-300 focus:bg-white/10 focus:text-white" data-testid="menu-account">
                   <Settings className="w-4 h-4 mr-2" />
                   Account Settings
