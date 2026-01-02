@@ -851,7 +851,8 @@ async def add_to_wishlist(
     }
     
     await db.wishlist.insert_one(item)
-    del item["_id"] if "_id" in item else None
+    if "_id" in item:
+        del item["_id"]
     return item
 
 @api_router.delete("/wishlist/{item_id}")
