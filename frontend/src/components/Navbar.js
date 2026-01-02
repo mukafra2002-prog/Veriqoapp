@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import { User, Settings, LogOut, Crown, Zap, Heart, GitCompare, History } from 'lucide-react';
+import { User, Settings, LogOut, Crown, Zap, Heart, GitCompare, History, Shield } from 'lucide-react';
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
