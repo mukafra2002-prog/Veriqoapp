@@ -5,7 +5,9 @@ import { Button } from '../components/ui/button';
 import { 
   Zap, CheckCircle, AlertTriangle, XCircle, Shield,
   ShoppingCart, Star, Users, Clock, ExternalLink,
-  ThumbsUp, ThumbsDown, ArrowRight, Share2, Loader2
+  ThumbsUp, ThumbsDown, ArrowRight, Share2, Loader2,
+  Target, UserCheck, UserX, TrendingUp, BarChart3,
+  Lock, Sparkles, Eye, Award
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
@@ -90,6 +92,36 @@ export default function PublicInsightPage() {
     }
   };
 
+  // Generate ideal buyers based on verdict and complaints
+  const getIdealBuyers = () => {
+    const score = insight?.confidence_score || 50;
+    if (score >= 70) {
+      return [
+        "Budget-conscious shoppers looking for good value",
+        "Users who prioritize functionality over premium finish",
+        "First-time buyers in this product category"
+      ];
+    } else if (score >= 40) {
+      return [
+        "Users with flexible expectations",
+        "Those who can verify compatibility before purchase",
+        "Shoppers comfortable with potential exchanges"
+      ];
+    }
+    return [
+      "Only if no alternatives are available",
+      "Users who can thoroughly verify specs first",
+      "Those with easy return access"
+    ];
+  };
+
+  // Calculate expectation score
+  const getExpectationScore = () => {
+    const confidence = insight?.confidence_score || 50;
+    const authenticity = insight?.authenticity_score || 70;
+    return Math.round((confidence * 0.6) + (authenticity * 0.4));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -127,6 +159,8 @@ export default function PublicInsightPage() {
 
   const verdictConfig = getVerdictConfig(insight?.verdict);
   const VerdictIcon = verdictConfig.icon;
+  const expectationScore = getExpectationScore();
+  const idealBuyers = getIdealBuyers();
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -144,7 +178,7 @@ export default function PublicInsightPage() {
 
       {/* Navigation */}
       <nav className="border-b border-white/5 sticky top-0 bg-slate-950/90 backdrop-blur-xl z-50">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
               <Zap className="w-5 h-5 text-white" />
@@ -166,7 +200,7 @@ export default function PublicInsightPage() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="text-sm text-slate-500 mb-6">
           <Link to="/" className="hover:text-white">Home</Link>
@@ -180,7 +214,7 @@ export default function PublicInsightPage() {
         <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-white/10 rounded-3xl p-8 mb-8">
           <div className="flex flex-col md:flex-row gap-8">
             {/* Product Image */}
-            <div className="w-full md:w-48 h-48 bg-white rounded-2xl overflow-hidden flex-shrink-0">
+            <div className="w-full md:w-56 h-56 bg-white rounded-2xl overflow-hidden flex-shrink-0">
               {insight?.product_image ? (
                 <img 
                   src={insight.product_image} 
@@ -225,106 +259,214 @@ export default function PublicInsightPage() {
           </div>
         </div>
 
-        {/* Score Section */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Confidence Score */}
-          <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <Star className="w-5 h-5 text-blue-400" />
-              Confidence Score
-            </h2>
-            <div className="flex items-center gap-6">
-              <div className="relative w-24 h-24">
-                <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-slate-700" strokeWidth="8"/>
-                  <circle 
-                    cx="50" cy="50" r="42" fill="none" 
-                    stroke={insight?.confidence_score >= 70 ? '#10B981' : insight?.confidence_score >= 40 ? '#F59E0B' : '#EF4444'} 
-                    strokeWidth="8" strokeLinecap="round" 
-                    strokeDasharray="264" 
-                    strokeDashoffset={264 - (264 * (insight?.confidence_score || 0) / 100)}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-3xl font-bold text-white">{insight?.confidence_score}</span>
-                </div>
-              </div>
-              <div>
-                <p className="text-slate-400 text-sm">
-                  Based on analysis of verified customer reviews
-                </p>
-              </div>
-            </div>
+        {/* FREE CONTENT SECTION */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-6">
+            <Eye className="w-5 h-5 text-emerald-400" />
+            <h2 className="text-xl font-bold text-white">Free Insights</h2>
+            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded-full">PUBLIC</span>
           </div>
 
-          {/* Quick Stats */}
-          <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <Users className="w-5 h-5 text-emerald-400" />
-              Analysis Summary
-            </h2>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">Verdict</span>
-                <span className={`font-semibold ${verdictConfig.color}`}>{insight?.verdict}</span>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Expectation Score */}
+            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Target className="w-5 h-5 text-blue-400" />
+                <h3 className="text-lg font-semibold text-white">Expectation Score</h3>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">Complaints Found</span>
-                <span className="text-white">{insight?.top_complaints?.length || 0}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">Last Updated</span>
-                <span className="text-white text-sm">
-                  {new Date(insight?.analyzed_at).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Summary */}
-        <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6 mb-8">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            Is "{insight?.product_name?.slice(0, 50)}" Worth It?
-          </h2>
-          <p className="text-slate-300 leading-relaxed">{insight?.summary}</p>
-        </div>
-
-        {/* Top Complaints */}
-        <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6 mb-8">
-          <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-            <ThumbsDown className="w-5 h-5 text-red-400" />
-            Top Customer Complaints
-          </h2>
-          <div className="space-y-4">
-            {insight?.top_complaints?.map((complaint, idx) => (
-              <div key={idx} className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold text-white mb-1">{complaint.title}</h3>
-                    <p className="text-slate-400 text-sm">{complaint.description}</p>
+              <div className="flex items-center gap-6">
+                <div className="relative w-28 h-28">
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-slate-700" strokeWidth="8"/>
+                    <circle 
+                      cx="50" cy="50" r="42" fill="none" 
+                      stroke={expectationScore >= 70 ? '#10B981' : expectationScore >= 40 ? '#F59E0B' : '#EF4444'} 
+                      strokeWidth="8" strokeLinecap="round" 
+                      strokeDasharray="264" 
+                      strokeDashoffset={264 - (264 * expectationScore / 100)}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-3xl font-bold text-white">{expectationScore}</span>
+                    <span className="text-xs text-slate-400">/ 100</span>
                   </div>
-                  <span className="text-red-400 text-sm font-medium ml-4">{complaint.frequency}</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-slate-300 text-sm mb-2">
+                    {expectationScore >= 70 ? 'High likelihood of meeting expectations' : 
+                     expectationScore >= 40 ? 'Mixed results - verify before buying' : 
+                     'Often falls short of expectations'}
+                  </p>
+                  <p className="text-slate-500 text-xs">
+                    Based on review sentiment and authenticity analysis
+                  </p>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Confidence Score */}
+            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Star className="w-5 h-5 text-amber-400" />
+                <h3 className="text-lg font-semibold text-white">Confidence Score</h3>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="relative w-28 h-28">
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-slate-700" strokeWidth="8"/>
+                    <circle 
+                      cx="50" cy="50" r="42" fill="none" 
+                      stroke={insight?.confidence_score >= 70 ? '#10B981' : insight?.confidence_score >= 40 ? '#F59E0B' : '#EF4444'} 
+                      strokeWidth="8" strokeLinecap="round" 
+                      strokeDasharray="264" 
+                      strokeDashoffset={264 - (264 * (insight?.confidence_score || 0) / 100)}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-3xl font-bold text-white">{insight?.confidence_score}</span>
+                    <span className="text-xs text-slate-400">/ 100</span>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <p className="text-slate-300 text-sm mb-2">
+                    AI-calculated purchase recommendation score
+                  </p>
+                  <p className="text-slate-500 text-xs">
+                    Based on verified customer reviews
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Key Concerns */}
+            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <AlertTriangle className="w-5 h-5 text-red-400" />
+                <h3 className="text-lg font-semibold text-white">Key Concerns</h3>
+              </div>
+              <div className="space-y-3">
+                {insight?.top_complaints?.slice(0, 3).map((complaint, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                    <div className="w-6 h-6 bg-red-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-red-400 text-xs font-bold">{idx + 1}</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white text-sm font-medium">{complaint.title}</p>
+                      <p className="text-red-400 text-xs mt-1">{complaint.frequency}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-purple-400" />
+                <h3 className="text-lg font-semibold text-white">AI Summary</h3>
+              </div>
+              <p className="text-slate-300 text-sm leading-relaxed">{insight?.summary}</p>
+            </div>
+
+            {/* Ideal Buyers */}
+            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <UserCheck className="w-5 h-5 text-emerald-400" />
+                <h3 className="text-lg font-semibold text-white">Ideal For</h3>
+              </div>
+              <ul className="space-y-2">
+                {idealBuyers.map((buyer, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-sm">
+                    <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-300">{buyer}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Not Ideal For */}
+            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <UserX className="w-5 h-5 text-red-400" />
+                <h3 className="text-lg font-semibold text-white">Not Ideal For</h3>
+              </div>
+              <ul className="space-y-2">
+                {insight?.who_should_not_buy?.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-sm">
+                    <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-300">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
-        {/* Who Should Not Buy */}
-        <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6 mb-8">
-          <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-amber-400" />
-            Who Should NOT Buy This Product?
-          </h2>
-          <ul className="space-y-3">
-            {insight?.who_should_not_buy?.map((item, idx) => (
-              <li key={idx} className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                <XCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                <span className="text-slate-300">{item}</span>
-              </li>
-            ))}
-          </ul>
+        {/* PAID CONTENT SECTION - Locked */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-6">
+            <Lock className="w-5 h-5 text-amber-400" />
+            <h2 className="text-xl font-bold text-white">Premium Insights</h2>
+            <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-xs rounded-full">PRO</span>
+          </div>
+
+          <div className="relative">
+            {/* Blurred Preview */}
+            <div className="grid md:grid-cols-3 gap-6 filter blur-sm opacity-60 pointer-events-none">
+              {/* Advanced Analytics */}
+              <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <BarChart3 className="w-5 h-5 text-blue-400" />
+                  <h3 className="text-lg font-semibold text-white">Advanced Analytics</h3>
+                </div>
+                <div className="h-32 bg-slate-700/50 rounded-xl"></div>
+              </div>
+
+              {/* Trend Analysis */}
+              <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <TrendingUp className="w-5 h-5 text-emerald-400" />
+                  <h3 className="text-lg font-semibold text-white">Review Trends</h3>
+                </div>
+                <div className="h-32 bg-slate-700/50 rounded-xl"></div>
+              </div>
+
+              {/* Seller Dashboard */}
+              <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Award className="w-5 h-5 text-purple-400" />
+                  <h3 className="text-lg font-semibold text-white">Seller Insights</h3>
+                </div>
+                <div className="h-32 bg-slate-700/50 rounded-xl"></div>
+              </div>
+            </div>
+
+            {/* Unlock Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-slate-900/95 backdrop-blur-sm border border-amber-500/30 rounded-2xl p-8 text-center max-w-md">
+                <div className="w-16 h-16 bg-amber-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Lock className="w-8 h-8 text-amber-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Unlock Premium Insights</h3>
+                <p className="text-slate-400 text-sm mb-6">
+                  Get advanced analytics, trend analysis, and seller dashboards with a Veriqo subscription.
+                </p>
+                <div className="space-y-3">
+                  <Link to="/register" className="block">
+                    <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-semibold">
+                      Start Free Trial
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
+                  <Link to="/pricing" className="block">
+                    <Button variant="outline" className="w-full border-white/20 text-slate-300 hover:text-white">
+                      View Pricing
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* CTA Section */}
@@ -344,9 +486,14 @@ export default function PublicInsightPage() {
         </div>
 
         {/* Disclaimer */}
-        <div className="text-center text-slate-500 text-sm mb-8">
+        <div className="text-center text-slate-500 text-xs mb-8 space-y-1">
           <p>
-            This analysis is generated by AI based on publicly available customer reviews. 
+            This analysis is generated by AI based on publicly available customer reviews.
+          </p>
+          <p>
+            Veriqo is not affiliated with Amazon. This content is for informational purposes only.
+          </p>
+          <p>
             As an Amazon Associate, Veriqo earns from qualifying purchases.
           </p>
         </div>
@@ -354,7 +501,7 @@ export default function PublicInsightPage() {
 
       {/* Footer */}
       <footer className="border-t border-white/5 py-8">
-        <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
               <Zap className="w-5 h-5 text-white" />
