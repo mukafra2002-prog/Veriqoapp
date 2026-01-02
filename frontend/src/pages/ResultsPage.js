@@ -31,6 +31,8 @@ export default function ResultsPage() {
   const { token, user } = useAuth();
   const [analysis, setAnalysis] = useState(location.state?.analysis || null);
   const [loading, setLoading] = useState(!location.state?.analysis);
+  const [savingToWishlist, setSavingToWishlist] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
 
   useEffect(() => {
     if (!analysis) {
