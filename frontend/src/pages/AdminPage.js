@@ -7,7 +7,8 @@ import {
   Zap, Users, ShoppingBag, CreditCard, TrendingUp,
   BarChart3, Search, Filter, ChevronRight, Crown,
   CheckCircle, XCircle, AlertTriangle, Eye, Trash2,
-  RefreshCw, Download, Settings, Shield, ArrowLeft
+  RefreshCw, Download, Settings, Shield, ArrowLeft,
+  Bot, Power, Database, Clock
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -19,6 +20,7 @@ export default function AdminPage() {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [analyses, setAnalyses] = useState([]);
+  const [aiConfig, setAiConfig] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,14 +31,16 @@ export default function AdminPage() {
 
   const fetchAdminData = async () => {
     try {
-      const [statsRes, usersRes, analysesRes] = await Promise.all([
+      const [statsRes, usersRes, analysesRes, aiRes] = await Promise.all([
         axios.get(`${API_URL}/admin/stats`, { headers: { Authorization: `Bearer ${token}` } }),
         axios.get(`${API_URL}/admin/users`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(`${API_URL}/admin/analyses`, { headers: { Authorization: `Bearer ${token}` } })
+        axios.get(`${API_URL}/admin/analyses`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_URL}/admin/ai-config`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: null }))
       ]);
       setStats(statsRes.data);
       setUsers(usersRes.data);
       setAnalyses(analysesRes.data);
+      setAiConfig(aiRes.data);
     } catch (error) {
       console.error('Failed to fetch admin data:', error);
       if (error.response?.status === 403) {
