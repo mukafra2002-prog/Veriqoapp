@@ -314,16 +314,30 @@ export default function ResultsPage() {
             Share Results
           </Button>
 
-          {user?.subscription_type === 'premium' && (
+          <Button
+            variant="outline"
+            className={`h-14 px-8 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white ${isInWishlist ? 'border-pink-500/50 text-pink-400' : ''}`}
+            onClick={handleSaveToWishlist}
+            disabled={savingToWishlist || isInWishlist}
+            data-testid="wishlist-btn"
+          >
+            {savingToWishlist ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Heart className={`w-4 h-4 mr-2 ${isInWishlist ? 'fill-pink-400' : ''}`} />
+            )}
+            {isInWishlist ? 'Saved' : 'Save to Wishlist'}
+          </Button>
+
+          <Link to="/compare">
             <Button
               variant="outline"
-              className="h-14 px-8 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white"
-              data-testid="save-btn"
+              className="h-14 px-8 rounded-xl border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400"
             >
-              <Bookmark className="w-4 h-4 mr-2" />
-              Save Result
+              <Sparkles className="w-4 h-4 mr-2" />
+              Compare Products
             </Button>
-          )}
+          </Link>
         </div>
       </main>
     </div>
