@@ -88,6 +88,7 @@ class UserResponse(BaseModel):
     checks_used_this_month: int
     checks_remaining: int
     onboarding_completed: bool = False
+    is_admin: bool = False
     created_at: str
 
 class TokenResponse(BaseModel):
