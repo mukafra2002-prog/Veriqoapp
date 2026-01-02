@@ -351,6 +351,157 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* AI Controls Tab */}
+        {activeTab === 'ai-controls' && aiConfig && (
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Emergency Switch */}
+            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${aiConfig.config.enabled ? 'bg-emerald-500/20' : 'bg-red-500/20'}`}>
+                    <Power className={`w-6 h-6 ${aiConfig.config.enabled ? 'text-emerald-400' : 'text-red-400'}`} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">AI Status</h3>
+                    <p className="text-slate-400 text-sm">Emergency disable switch</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={toggleAI}
+                  className={aiConfig.config.enabled 
+                    ? 'bg-red-600 hover:bg-red-500 text-white' 
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                  }
+                >
+                  {aiConfig.config.enabled ? 'Disable AI' : 'Enable AI'}
+                </Button>
+              </div>
+              <div className={`p-4 rounded-xl ${aiConfig.config.enabled ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-red-500/10 border border-red-500/20'}`}>
+                <div className="flex items-center gap-2">
+                  {aiConfig.config.enabled ? (
+                    <CheckCircle className="w-5 h-5 text-emerald-400" />
+                  ) : (
+                    <XCircle className="w-5 h-5 text-red-400" />
+                  )}
+                  <span className={aiConfig.config.enabled ? 'text-emerald-400' : 'text-red-400'}>
+                    AI is currently {aiConfig.config.enabled ? 'ENABLED' : 'DISABLED'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Usage Stats */}
+            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="w-6 h-6 text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">AI Usage</h3>
+                  <p className="text-slate-400 text-sm">Today's statistics</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Requests Today</span>
+                  <span className="text-white font-semibold">{aiConfig.usage?.requests_today || 0}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Cache Hits</span>
+                  <span className="text-emerald-400 font-semibold">{aiConfig.usage?.cache_hits_today || 0}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Cache Hit Rate</span>
+                  <span className="text-blue-400 font-semibold">{aiConfig.usage?.cache_hit_rate || 0}%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Total Requests</span>
+                  <span className="text-white">{aiConfig.usage?.total_requests || 0}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Configuration */}
+            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                  <Settings className="w-6 h-6 text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Configuration</h3>
+                  <p className="text-slate-400 text-sm">AI safety limits</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center p-3 bg-slate-900/50 rounded-xl">
+                  <span className="text-slate-400">Max Tokens/Request</span>
+                  <span className="text-white font-mono">{aiConfig.config?.max_tokens_per_request}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-slate-900/50 rounded-xl">
+                  <span className="text-slate-400">Max Requests/User/Day</span>
+                  <span className="text-white font-mono">{aiConfig.config?.max_requests_per_user_per_day}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-slate-900/50 rounded-xl">
+                  <span className="text-slate-400">Cache TTL</span>
+                  <span className="text-white font-mono">{aiConfig.config?.cache_ttl_hours}h</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-slate-900/50 rounded-xl">
+                  <span className="text-slate-400">Neutral Language</span>
+                  <span className="text-emerald-400">Enforced</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Cache Controls */}
+            <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                  <Database className="w-6 h-6 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Cache Management</h3>
+                  <p className="text-slate-400 text-sm">Cached AI responses</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <p className="text-slate-400 text-sm">
+                  Cached responses reduce AI costs and improve response times. 
+                  Clear cache if you need to force fresh analyses.
+                </p>
+                <Button
+                  onClick={clearAICache}
+                  variant="outline"
+                  className="w-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Clear AI Cache
+                </Button>
+              </div>
+            </div>
+
+            {/* Disclaimers */}
+            <div className="md:col-span-2 bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-slate-500/20 rounded-xl flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-slate-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Required Disclaimers</h3>
+                  <p className="text-slate-400 text-sm">Automatically added to all AI outputs</p>
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                {aiConfig.disclaimers && Object.entries(aiConfig.disclaimers).map(([key, value]) => (
+                  <div key={key} className="p-4 bg-slate-900/50 rounded-xl">
+                    <p className="text-xs text-slate-500 uppercase mb-2">{key}</p>
+                    <p className="text-slate-300 text-sm">{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Overview Tab */}
         {activeTab === 'overview' && (
           <div className="grid md:grid-cols-2 gap-6">
