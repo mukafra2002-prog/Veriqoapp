@@ -1177,6 +1177,70 @@ async def reset_user_checks(user_id: str, admin: dict = Depends(get_admin_user))
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "Checks reset"}
 
+# ==================== AI CONTROL ADMIN ROUTES ====================
+
+@api_router.get("/admin/ai-config")
+async def get_ai_config(admin: dict = Depends(get_admin_user)):
+    """Get current AI configuration"""
+    # Get usage stats
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    total_requests = await db.ai_usage.count_documents({})
+    requests_today = await db.ai_usage.count_documents({"timestamp": {"$gte": today.isoformat()}})
+    cache_hits_today = await db.ai_usage.count_documents({"timestamp": {"$gte": today.isoformat()}, "cache_hit": True})
+    
+    return {
+        "config": AI_CONFIG,
+        "usage": {
+            "total_requests": total_requests,
+            "requests_today": requests_today,
+            "cache_hits_today": cache_hits_today,
+            "cache_hit_rate": round((cache_hits_today / requests_today * 100) if requests_today > 0 else 0, 1)
+        },
+        "disclaimers": REQUIRED_DISCLAIMERS
+    }
+
+@api_router.post("/admin/ai-config/toggle")
+async def toggle_ai(enabled: bool = Body(..., embed=True), admin: dict = Depends(get_admin_user)):
+    """Emergency disable/enable switch for AI"""
+    global AI_CONFIG
+    AI_CONFIG["enabled"] = enabled
+    
+    # Log the action
+    await db.admin_logs.insert_one({
+        "id": str(uuid.uuid4()),
+        "admin_id": admin["id"],
+        "action": "ai_toggle",
+        "value": enabled,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    })
+    
+    return {"message": f"AI {'enabled' if enabled else 'disabled'}", "enabled": enabled}
+
+@api_router.post("/admin/ai-config/update")
+async def update_ai_config(
+    max_tokens: int = Body(None),
+    max_requests_per_day: int = Body(None),
+    cache_ttl_hours: int = Body(None),
+    admin: dict = Depends(get_admin_user)
+):
+    """Update AI configuration parameters"""
+    global AI_CONFIG
+    
+    if max_tokens is not None:
+        AI_CONFIG["max_tokens_per_request"] = max_tokens
+    if max_requests_per_day is not None:
+        AI_CONFIG["max_requests_per_user_per_day"] = max_requests_per_day
+    if cache_ttl_hours is not None:
+        AI_CONFIG["cache_ttl_hours"] = cache_ttl_hours
+    
+    return {"message": "AI config updated", "config": AI_CONFIG}
+
+@api_router.delete("/admin/ai-cache")
+async def clear_ai_cache(admin: dict = Depends(get_admin_user)):
+    """Clear all cached AI responses"""
+    result = await db.ai_cache.delete_many({})
+    return {"message": f"Cleared {result.deleted_count} cached responses"}
+
 # ==================== PUBLIC INSIGHTS ROUTES ====================
 
 @api_router.get("/insights", response_model=List[ProductAnalysisResponse])
