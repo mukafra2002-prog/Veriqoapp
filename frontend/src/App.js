@@ -17,6 +17,8 @@ import ShoppersPage from "./pages/ShoppersPage";
 import SellersPage from "./pages/SellersPage";
 import PublicInsightPage from "./pages/PublicInsightPage";
 import InsightsDirectoryPage from "./pages/InsightsDirectoryPage";
+import WishlistPage from "./pages/WishlistPage";
+import ComparePage from "./pages/ComparePage";
 import "./App.css";
 
 // Protected Route Component
