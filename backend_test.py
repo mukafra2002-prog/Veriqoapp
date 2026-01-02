@@ -342,6 +342,166 @@ class VeriqoAPITester:
         )
         return success
 
+    # ==================== NEW WISHLIST TESTS ====================
+    
+    def test_get_empty_wishlist(self):
+        """Test getting empty wishlist"""
+        success, response = self.run_test(
+            "Get Empty Wishlist",
+            "GET",
+            "wishlist",
+            200
+        )
+        if success:
+            print(f"   Wishlist items: {len(response)}")
+            return True
+        return False
+
+    def test_add_to_wishlist(self):
+        """Test adding product to wishlist"""
+        success, response = self.run_test(
+            "Add to Wishlist",
+            "POST",
+            "wishlist",
+            200,
+            data={
+                "product_url": "https://www.amazon.com/dp/B08N5WRWNW",
+                "product_name": "Apple AirTag",
+                "product_image": "https://example.com/image.jpg",
+                "notes": "Test wishlist item"
+            }
+        )
+        if success:
+            print(f"   Added item ID: {response.get('id', 'N/A')}")
+            print(f"   Product: {response.get('product_name', 'N/A')}")
+            return True, response.get('id')
+        return False, None
+
+    def test_get_wishlist_with_items(self):
+        """Test getting wishlist with items"""
+        success, response = self.run_test(
+            "Get Wishlist with Items",
+            "GET",
+            "wishlist",
+            200
+        )
+        if success:
+            print(f"   Wishlist items: {len(response)}")
+            if len(response) > 0:
+                item = response[0]
+                required_fields = ['id', 'user_id', 'product_url', 'product_name', 'added_at']
+                missing_fields = [field for field in required_fields if field not in item]
+                if missing_fields:
+                    print(f"   ⚠️  Missing fields in wishlist item: {missing_fields}")
+                    return False
+                print(f"   ✅ Wishlist response structure is valid")
+            return True
+        return False
+
+    def test_remove_from_wishlist(self, item_id):
+        """Test removing product from wishlist"""
+        if not item_id:
+            print("   ⚠️  No item ID provided for removal test")
+            return False
+            
+        success, response = self.run_test(
+            "Remove from Wishlist",
+            "DELETE",
+            f"wishlist/{item_id}",
+            200
+        )
+        if success:
+            print(f"   Removed item: {item_id}")
+            return True
+        return False
+
+    def test_add_duplicate_to_wishlist(self):
+        """Test adding duplicate product to wishlist (should fail)"""
+        success, response = self.run_test(
+            "Add Duplicate to Wishlist",
+            "POST",
+            "wishlist",
+            400,
+            data={
+                "product_url": "https://www.amazon.com/dp/B08N5WRWNW",
+                "product_name": "Apple AirTag Duplicate",
+                "notes": "This should fail"
+            }
+        )
+        return success
+
+    # ==================== NEW COMPARISON TESTS ====================
+    
+    def test_compare_products_valid(self):
+        """Test comparing 2 valid Amazon products"""
+        success, response = self.run_test(
+            "Compare Products (Valid)",
+            "POST",
+            "compare",
+            200,
+            data={
+                "product_urls": [
+                    "https://www.amazon.com/dp/B08N5WRWNW",
+                    "https://www.amazon.com/dp/B09V3KXJPB"
+                ]
+            }
+        )
+        if success:
+            print(f"   Products compared: {len(response.get('products', []))}")
+            print(f"   Winner: {response.get('winner', {}).get('product_name', 'N/A')}")
+            
+            # Verify response structure
+            required_fields = ['products', 'comparison_summary', 'winner']
+            missing_fields = [field for field in required_fields if field not in response]
+            if missing_fields:
+                print(f"   ⚠️  Missing fields in comparison response: {missing_fields}")
+                return False
+            
+            # Check products structure
+            products = response.get('products', [])
+            if len(products) >= 2:
+                for i, product in enumerate(products[:2]):
+                    if 'error' not in product:
+                        product_fields = ['id', 'product_name', 'verdict', 'confidence_score']
+                        missing_product_fields = [field for field in product_fields if field not in product]
+                        if missing_product_fields:
+                            print(f"   ⚠️  Missing fields in product {i+1}: {missing_product_fields}")
+                            return False
+                print(f"   ✅ Comparison response structure is valid")
+            return True
+        return False
+
+    def test_compare_products_insufficient(self):
+        """Test comparing with insufficient URLs (should fail)"""
+        success, response = self.run_test(
+            "Compare Products (Insufficient URLs)",
+            "POST",
+            "compare",
+            400,
+            data={
+                "product_urls": ["https://www.amazon.com/dp/B08N5WRWNW"]
+            }
+        )
+        return success
+
+    def test_compare_products_too_many(self):
+        """Test comparing with too many URLs (should fail)"""
+        success, response = self.run_test(
+            "Compare Products (Too Many URLs)",
+            "POST",
+            "compare",
+            400,
+            data={
+                "product_urls": [
+                    "https://www.amazon.com/dp/B08N5WRWNW",
+                    "https://www.amazon.com/dp/B09V3KXJPB",
+                    "https://www.amazon.com/dp/B08N5WRWNW",
+                    "https://www.amazon.com/dp/B09V3KXJPB"
+                ]
+            }
+        )
+        return success
+
 def main():
     print("🚀 Starting Veriqo API Tests - Focus on Session Persistence & History")
     print("=" * 70)
