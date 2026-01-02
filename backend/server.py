@@ -951,6 +951,83 @@ def get_comparison_winner(products: List[dict]) -> dict:
         "reason": f"Highest confidence score of {winner.get('confidence_score')}%"
     }
 
+# ==================== ADMIN ROUTES ====================
+
+async def get_admin_user(user: dict = Depends(get_current_user)):
+    """Dependency to check if user is admin"""
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(admin: dict = Depends(get_admin_user)):
+    """Get admin dashboard statistics"""
+    from datetime import timedelta
+    
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    # User stats
+    total_users = await db.users.count_documents({})
+    new_users_today = await db.users.count_documents({"created_at": {"$gte": today.isoformat()}})
+    premium_users = await db.users.count_documents({"subscription_type": "premium"})
+    
+    # Analysis stats
+    total_analyses = await db.product_analyses.count_documents({})
+    analyses_today = await db.product_analyses.count_documents({"analyzed_at": {"$gte": today.isoformat()}})
+    
+    # Verdict distribution
+    verdict_buy = await db.product_analyses.count_documents({"verdict": "BUY"})
+    verdict_think = await db.product_analyses.count_documents({"verdict": "THINK"})
+    verdict_avoid = await db.product_analyses.count_documents({"verdict": "AVOID"})
+    
+    return {
+        "total_users": total_users,
+        "new_users_today": new_users_today,
+        "premium_users": premium_users,
+        "premium_percentage": round((premium_users / total_users * 100) if total_users > 0 else 0, 1),
+        "total_analyses": total_analyses,
+        "analyses_today": analyses_today,
+        "verdict_buy": verdict_buy,
+        "verdict_think": verdict_think,
+        "verdict_avoid": verdict_avoid,
+        "mrr": premium_users * 6.99,
+        "revenue_today": 0
+    }
+
+@api_router.get("/admin/users")
+async def get_admin_users(admin: dict = Depends(get_admin_user), limit: int = 100):
+    """Get all users for admin"""
+    users = await db.users.find({}, {"_id": 0, "password_hash": 0}).sort("created_at", -1).limit(limit).to_list(limit)
+    return users
+
+@api_router.get("/admin/analyses")
+async def get_admin_analyses(admin: dict = Depends(get_admin_user), limit: int = 100):
+    """Get all analyses for admin"""
+    analyses = await db.product_analyses.find({}, {"_id": 0}).sort("analyzed_at", -1).limit(limit).to_list(limit)
+    return analyses
+
+@api_router.patch("/admin/users/{user_id}")
+async def update_user_admin(user_id: str, is_admin: bool = Body(..., embed=True), admin: dict = Depends(get_admin_user)):
+    """Update user admin status"""
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"is_admin": is_admin}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User updated"}
+
+@api_router.post("/admin/users/{user_id}/reset-checks")
+async def reset_user_checks(user_id: str, admin: dict = Depends(get_admin_user)):
+    """Reset user's monthly checks"""
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"checks_remaining": 3, "checks_used_this_month": 0}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "Checks reset"}
+
 # ==================== PUBLIC INSIGHTS ROUTES ====================
 
 @api_router.get("/insights", response_model=List[ProductAnalysisResponse])
