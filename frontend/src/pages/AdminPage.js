@@ -80,6 +80,31 @@ export default function AdminPage() {
     }
   };
 
+  const toggleAI = async () => {
+    try {
+      const newState = !aiConfig?.config?.enabled;
+      await axios.post(
+        `${API_URL}/admin/ai-config/toggle`,
+        { enabled: newState },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success(`AI ${newState ? 'enabled' : 'disabled'}`);
+      fetchAdminData();
+    } catch (error) {
+      toast.error('Failed to toggle AI');
+    }
+  };
+
+  const clearAICache = async () => {
+    try {
+      await axios.delete(`${API_URL}/admin/ai-cache`, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('AI cache cleared');
+      fetchAdminData();
+    } catch (error) {
+      toast.error('Failed to clear cache');
+    }
+  };
+
   const filteredUsers = users.filter(u => 
     u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.name?.toLowerCase().includes(searchQuery.toLowerCase())
