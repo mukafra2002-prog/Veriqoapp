@@ -117,6 +117,12 @@ export const Navbar = () => {
                   <Settings className="w-4 h-4 mr-2" />
                   Account Settings
                 </DropdownMenuItem>
+                {user?.is_admin && (
+                  <DropdownMenuItem onClick={() => navigate('/admin')} className="text-red-400 focus:bg-red-500/10 focus:text-red-400" data-testid="menu-admin">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin Dashboard
+                  </DropdownMenuItem>
+                )}
                 {user?.subscription_type !== 'premium' && (
                   <DropdownMenuItem onClick={() => navigate('/pricing')} className="text-slate-300 focus:bg-white/10 focus:text-white" data-testid="menu-upgrade">
                     <Crown className="w-4 h-4 mr-2" />
