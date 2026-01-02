@@ -109,11 +109,25 @@ class ProductAnalysisResponse(BaseModel):
     amazon_url: str
     verdict: str
     confidence_score: int
+    authenticity_score: Optional[int] = None  # Review authenticity score
     top_complaints: List[Complaint]
     who_should_not_buy: List[str]
     summary: str
     affiliate_url: str
     analyzed_at: str
+    alternatives: Optional[List[dict]] = None  # Alternative product suggestions
+
+class WishlistItem(BaseModel):
+    id: str
+    user_id: str
+    product_url: str
+    product_name: str
+    product_image: Optional[str] = None
+    added_at: str
+    notes: Optional[str] = None
+
+class ComparisonRequest(BaseModel):
+    product_urls: List[str]  # 2-3 product URLs to compare
 
 class CheckoutRequest(BaseModel):
     plan_id: str
