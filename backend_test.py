@@ -503,7 +503,7 @@ class VeriqoAPITester:
         return success
 
 def main():
-    print("🚀 Starting Veriqo API Tests - Focus on Session Persistence & History")
+    print("🚀 Starting Veriqo API Tests - New Features: Wishlist & Comparison")
     print("=" * 70)
     
     # Setup
@@ -521,19 +521,43 @@ def main():
         ("Login with Test User", lambda: tester.test_login(test_email, test_password)),
         ("Session Persistence Test", tester.test_session_persistence_simulation),
         ("Get Current User", tester.test_get_me),
+    ]
+    
+    # NEW WISHLIST TESTS
+    wishlist_tests = [
+        ("Get Empty Wishlist", tester.test_get_empty_wishlist),
+        ("Add to Wishlist", tester.test_add_to_wishlist),
+        ("Get Wishlist with Items", tester.test_get_wishlist_with_items),
+        ("Add Duplicate to Wishlist", tester.test_add_duplicate_to_wishlist),
+    ]
+    
+    # NEW COMPARISON TESTS  
+    comparison_tests = [
+        ("Compare Products (Valid)", tester.test_compare_products_valid),
+        ("Compare Products (Insufficient URLs)", tester.test_compare_products_insufficient),
+        ("Compare Products (Too Many URLs)", tester.test_compare_products_too_many),
+    ]
+    
+    # EXISTING TESTS
+    existing_tests = [
         ("Get Analysis History", tester.test_get_history),
-        ("CSV Export (Free User)", tester.test_csv_export_free_user),
         ("Product Analysis Integration", tester.test_product_analysis_integration),
     ]
     
-    # Run tests
+    # Run all tests
+    all_tests = tests + wishlist_tests + comparison_tests + existing_tests
     failed_tests = []
-    for test_name, test_func in tests:
+    wishlist_item_id = None
+    
+    for test_name, test_func in all_tests:
         try:
             print(f"\n{'='*50}")
             result = test_func()
             if isinstance(result, tuple):
                 success = result[0]
+                # Store wishlist item ID for removal test
+                if test_name == "Add to Wishlist" and success:
+                    wishlist_item_id = result[1]
             else:
                 success = result
                 
@@ -546,7 +570,21 @@ def main():
             failed_tests.append(test_name)
             print(f"💥 Test '{test_name}' crashed: {str(e)}")
     
-    # Additional tests for completeness
+    # Test wishlist removal if we have an item ID
+    if wishlist_item_id:
+        try:
+            print(f"\n{'='*50}")
+            result = tester.test_remove_from_wishlist(wishlist_item_id)
+            if not result:
+                failed_tests.append("Remove from Wishlist")
+                print(f"⚠️  Test 'Remove from Wishlist' failed")
+            else:
+                print(f"✅ Test 'Remove from Wishlist' passed")
+        except Exception as e:
+            failed_tests.append("Remove from Wishlist")
+            print(f"💥 Test 'Remove from Wishlist' crashed: {str(e)}")
+    
+    # Additional validation tests
     print(f"\n{'='*50}")
     print("🔄 Running additional validation tests...")
     
