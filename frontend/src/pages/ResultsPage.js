@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Navbar } from '../components/Navbar';
 import { ScoreGauge } from '../components/ScoreGauge';
@@ -13,7 +13,12 @@ import {
   Shield, 
   Clock,
   Share2,
-  Bookmark
+  Bookmark,
+  Heart,
+  Loader2,
+  ShieldCheck,
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 
