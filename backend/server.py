@@ -605,9 +605,11 @@ Based on this information, provide your analysis with a Buy/Think/Avoid verdict.
 Given product data (or just a URL), analyze and provide:
 1. A verdict: "buy" (score 70-100), "think" (score 40-69), or "avoid" (score 0-39)
 2. A confidence score from 0-100
-3. Top 3 real complaints from reviews (or realistic ones if no reviews provided)
-4. Who should NOT buy this product (2-3 specific user types)
-5. A brief summary
+3. An authenticity score from 0-100 (how trustworthy the reviews appear - look for signs of fake reviews)
+4. Top 3 real complaints from reviews (or realistic ones if no reviews provided)
+5. Who should NOT buy this product (2-3 specific user types)
+6. A brief summary
+7. 2 alternative product suggestions (generic product types that might be better)
 
 Respond ONLY with valid JSON in this exact format:
 {
@@ -615,13 +617,18 @@ Respond ONLY with valid JSON in this exact format:
   "product_image": null,
   "verdict": "buy|think|avoid",
   "confidence_score": 75,
+  "authenticity_score": 82,
   "top_complaints": [
     {"title": "Complaint Title", "description": "Detailed description of the complaint", "frequency": "23% of reviews"},
     {"title": "Another Issue", "description": "Another common complaint", "frequency": "18% of reviews"},
     {"title": "Third Concern", "description": "Third most common issue", "frequency": "12% of reviews"}
   ],
   "who_should_not_buy": ["User type 1 who shouldn't buy", "User type 2 who shouldn't buy"],
-  "summary": "Brief 2-3 sentence summary of the product quality and value"
+  "summary": "Brief 2-3 sentence summary of the product quality and value",
+  "alternatives": [
+    {"name": "Alternative Product 1", "reason": "Why this might be better"},
+    {"name": "Alternative Product 2", "reason": "Why this might be better"}
+  ]
 }"""
     ).with_model("openai", "gpt-5.2")
     
