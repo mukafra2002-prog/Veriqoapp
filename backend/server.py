@@ -620,11 +620,113 @@ async def analyze_product(data: ProductAnalysisRequest, user: dict = Depends(get
         analyzed_at=analysis_doc["analyzed_at"]
     )
 
-async def perform_ai_analysis(amazon_url: str) -> dict:
+# ==================== AI SAFETY FUNCTIONS ====================
+
+async def check_ai_enabled():
+    """Check if AI is enabled (emergency disable switch)"""
+    if not AI_CONFIG["enabled"]:
+        raise HTTPException(status_code=503, detail="AI analysis temporarily disabled for maintenance")
+    return True
+
+async def check_user_ai_rate_limit(user_id: str) -> bool:
+    """Check if user has exceeded daily AI request limit"""
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    count = await db.ai_usage.count_documents({
+        "user_id": user_id,
+        "timestamp": {"$gte": today.isoformat()}
+    })
+    return count < AI_CONFIG["max_requests_per_user_per_day"]
+
+async def log_ai_usage(user_id: str, tokens_used: int, cache_hit: bool):
+    """Log AI usage for monitoring and billing"""
+    await db.ai_usage.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "tokens_used": tokens_used,
+        "cache_hit": cache_hit,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    })
+
+async def get_cached_analysis(url_hash: str) -> Optional[dict]:
+    """Get cached AI analysis if available and not expired"""
+    cache = await db.ai_cache.find_one({"url_hash": url_hash})
+    if cache:
+        cache_time = datetime.fromisoformat(cache["cached_at"])
+        if datetime.now(timezone.utc) - cache_time < timedelta(hours=AI_CONFIG["cache_ttl_hours"]):
+            return cache["result"]
+    return None
+
+async def cache_analysis(url_hash: str, result: dict):
+    """Cache AI analysis result"""
+    await db.ai_cache.update_one(
+        {"url_hash": url_hash},
+        {"$set": {
+            "url_hash": url_hash,
+            "result": result,
+            "cached_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+
+def sanitize_ai_output(result: dict) -> dict:
+    """Sanitize AI output to ensure neutral language and add required disclaimers"""
+    # Forbidden phrases to remove
+    forbidden_phrases = [
+        "fake review", "fraudulent", "scam", "dishonest", "lying",
+        "definitely", "certainly", "you must", "you should definitely"
+    ]
+    
+    # Sanitize text fields
+    for field in ["summary", "product_name"]:
+        if field in result and isinstance(result[field], str):
+            text = result[field]
+            for phrase in forbidden_phrases:
+                text = text.replace(phrase, "")
+                text = text.replace(phrase.title(), "")
+            result[field] = text
+    
+    # Sanitize complaints
+    if "top_complaints" in result:
+        for complaint in result["top_complaints"]:
+            if "description" in complaint:
+                text = complaint["description"]
+                for phrase in forbidden_phrases:
+                    text = text.replace(phrase, "")
+                complaint["description"] = text
+    
+    # Remove authenticity_score if it makes accusations
+    # Instead, we just won't display it prominently
+    if "authenticity_score" in result:
+        # Keep it but ensure it's not used to make accusations
+        result["review_quality_indicator"] = result.pop("authenticity_score")
+    
+    # Add required disclaimers
+    result["disclaimers"] = REQUIRED_DISCLAIMERS
+    
+    return result
+
+async def perform_ai_analysis(amazon_url: str, user_id: str = None) -> dict:
+    """Perform AI analysis with safety controls"""
     from emergentintegrations.llm.chat import LlmChat, UserMessage
     from bs4 import BeautifulSoup
-    import json
     import re
+    
+    # Check if AI is enabled
+    await check_ai_enabled()
+    
+    # Check rate limit for user
+    if user_id and not await check_user_ai_rate_limit(user_id):
+        raise HTTPException(status_code=429, detail="Daily AI analysis limit reached. Please try again tomorrow.")
+    
+    # Generate URL hash for caching
+    url_hash = hashlib.md5(amazon_url.encode()).hexdigest()
+    
+    # Check cache first
+    cached = await get_cached_analysis(url_hash)
+    if cached:
+        if user_id:
+            await log_ai_usage(user_id, 0, cache_hit=True)
+        return sanitize_ai_output(cached)
     
     api_key = os.environ.get('EMERGENT_LLM_KEY')
     if not api_key:
@@ -643,50 +745,23 @@ Review Count: {scraped_data.get('review_count', 'Unknown')}
 Sample Reviews:
 {scraped_data.get('sample_reviews', 'No reviews available')}
 """
-        prompt = f"""Analyze this Amazon product based on the following real data:
+        prompt = f"""Summarize the aggregated customer feedback for this product:
 
 {product_context}
 
 URL: {amazon_url}
 
-Based on this information, provide your analysis with a Buy/Think/Avoid verdict."""
+Provide a NEUTRAL summary of feedback patterns with a verdict. Remember to use hedging language and avoid accusations."""
     else:
-        prompt = f"Analyze this Amazon product URL and provide your verdict: {amazon_url}\n\nGenerate a realistic analysis for this product. Be specific and helpful."
+        prompt = f"Summarize aggregated customer feedback patterns for this Amazon product: {amazon_url}\n\nProvide a neutral analysis based on typical feedback patterns for similar products."
     
+    # Use controlled, predefined system prompt
     chat = LlmChat(
         api_key=api_key,
         session_id=f"veriqo-analysis-{uuid.uuid4()}",
-        system_message="""You are Veriqo, an expert Amazon product review analyzer. Your job is to help shoppers make confident purchase decisions by analyzing product reviews.
-
-Given product data (or just a URL), analyze and provide:
-1. A verdict: "buy" (score 70-100), "think" (score 40-69), or "avoid" (score 0-39)
-2. A confidence score from 0-100
-3. An authenticity score from 0-100 (how trustworthy the reviews appear - look for signs of fake reviews)
-4. Top 3 real complaints from reviews (or realistic ones if no reviews provided)
-5. Who should NOT buy this product (2-3 specific user types)
-6. A brief summary
-7. 2 alternative product suggestions (generic product types that might be better)
-
-Respond ONLY with valid JSON in this exact format:
-{
-  "product_name": "Product Name Here",
-  "product_image": null,
-  "verdict": "buy|think|avoid",
-  "confidence_score": 75,
-  "authenticity_score": 82,
-  "top_complaints": [
-    {"title": "Complaint Title", "description": "Detailed description of the complaint", "frequency": "23% of reviews"},
-    {"title": "Another Issue", "description": "Another common complaint", "frequency": "18% of reviews"},
-    {"title": "Third Concern", "description": "Third most common issue", "frequency": "12% of reviews"}
-  ],
-  "who_should_not_buy": ["User type 1 who shouldn't buy", "User type 2 who shouldn't buy"],
-  "summary": "Brief 2-3 sentence summary of the product quality and value",
-  "alternatives": [
-    {"name": "Alternative Product 1", "reason": "Why this might be better"},
-    {"name": "Alternative Product 2", "reason": "Why this might be better"}
-  ]
-}"""
-    ).with_model("openai", "gpt-5.2")
+        system_message=AI_SYSTEM_PROMPT,
+        max_tokens=AI_CONFIG["max_tokens_per_request"]  # Token limit
+    ).with_model("openai", "gpt-4o-mini")  # Use smaller model for cost control
     
     user_message = UserMessage(text=prompt)
     response = await chat.send_message(user_message)
@@ -710,14 +785,32 @@ Respond ONLY with valid JSON in this exact format:
             "product_image": scraped_data.get("product_image") if scraped_data else None,
             "verdict": "think",
             "confidence_score": 65,
-            "authenticity_score": 70,
             "top_complaints": [
-                {"title": "Quality Concerns", "description": "Some users report build quality issues", "frequency": "15% of reviews"},
-                {"title": "Shipping Issues", "description": "Occasional delays reported", "frequency": "8% of reviews"},
-                {"title": "Size Variations", "description": "Dimensions may vary", "frequency": "5% of reviews"}
+                {"title": "Mixed Feedback", "description": "Some customers reported quality variations", "frequency": "~15% of feedback"},
+                {"title": "Delivery Experience", "description": "Occasional shipping delays noted", "frequency": "~8% of feedback"},
+                {"title": "Size/Fit Variations", "description": "Some feedback mentions sizing differences", "frequency": "~5% of feedback"}
             ],
-            "who_should_not_buy": ["Users seeking premium quality", "Those needing immediate delivery"],
-            "summary": "Decent value but has some quality control issues.",
+            "who_should_not_buy": ["Those seeking premium-tier quality", "Users with urgent delivery needs"],
+            "summary": "This product shows mixed feedback patterns. Some customers report satisfaction while others note areas for improvement.",
+            "positive_highlights": ["Reasonable value for price point", "Generally meets basic expectations"],
+            "disclaimer": REQUIRED_DISCLAIMERS["analysis"]
+        }
+    
+    # Sanitize output and add disclaimers
+    result = sanitize_ai_output(result)
+    
+    # Cache the result
+    await cache_analysis(url_hash, result)
+    
+    # Log AI usage
+    if user_id:
+        await log_ai_usage(user_id, AI_CONFIG["max_tokens_per_request"], cache_hit=False)
+    
+    return result
+
+async def perform_ai_analysis_legacy(amazon_url: str) -> dict:
+    """Legacy wrapper for backward compatibility"""
+    return await perform_ai_analysis(amazon_url, user_id=None)
             "alternatives": [
                 {"name": "Higher-rated alternative in same category", "reason": "Better reviews and quality"},
                 {"name": "Budget-friendly option", "reason": "Similar features at lower price"}
