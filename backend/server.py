@@ -654,13 +654,18 @@ Respond ONLY with valid JSON in this exact format:
             "product_image": scraped_data.get("product_image") if scraped_data else None,
             "verdict": "think",
             "confidence_score": 65,
+            "authenticity_score": 70,
             "top_complaints": [
                 {"title": "Quality Concerns", "description": "Some users report build quality issues", "frequency": "15% of reviews"},
                 {"title": "Shipping Issues", "description": "Occasional delays reported", "frequency": "8% of reviews"},
                 {"title": "Size Variations", "description": "Dimensions may vary", "frequency": "5% of reviews"}
             ],
             "who_should_not_buy": ["Users seeking premium quality", "Those needing immediate delivery"],
-            "summary": "Decent value but has some quality control issues."
+            "summary": "Decent value but has some quality control issues.",
+            "alternatives": [
+                {"name": "Higher-rated alternative in same category", "reason": "Better reviews and quality"},
+                {"name": "Budget-friendly option", "reason": "Similar features at lower price"}
+            ]
         }
     
     affiliate_tag = "veriqo-20"
