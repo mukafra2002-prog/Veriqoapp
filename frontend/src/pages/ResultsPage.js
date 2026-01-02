@@ -65,6 +65,39 @@ export default function ResultsPage() {
     toast.success('Link copied to clipboard!');
   };
 
+  const handleSaveToWishlist = async () => {
+    setSavingToWishlist(true);
+    try {
+      await axios.post(
+        `${API_URL}/wishlist`,
+        {
+          product_url: analysis.amazon_url,
+          product_name: analysis.product_name,
+          product_image: analysis.product_image
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setIsInWishlist(true);
+      toast.success('Added to wishlist!');
+    } catch (error) {
+      if (error.response?.status === 400) {
+        toast.info('Already in wishlist');
+        setIsInWishlist(true);
+      } else {
+        toast.error('Failed to save');
+      }
+    } finally {
+      setSavingToWishlist(false);
+    }
+  };
+
+  const getAuthenticityLabel = (score) => {
+    if (score >= 80) return { label: 'Highly Trustworthy', color: 'text-emerald-400' };
+    if (score >= 60) return { label: 'Mostly Reliable', color: 'text-blue-400' };
+    if (score >= 40) return { label: 'Mixed Signals', color: 'text-amber-400' };
+    return { label: 'Use Caution', color: 'text-red-400' };
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950">
