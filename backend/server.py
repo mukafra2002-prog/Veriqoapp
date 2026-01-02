@@ -803,6 +803,141 @@ async def export_history(user: dict = Depends(get_current_user)):
         headers={"Content-Disposition": f"attachment; filename=veriqo-history-{datetime.now(timezone.utc).strftime('%Y-%m-%d')}.csv"}
     )
 
+# ==================== WISHLIST ROUTES ====================
+
+@api_router.get("/wishlist", response_model=List[WishlistItem])
+async def get_wishlist(user: dict = Depends(get_current_user)):
+    """Get user's saved products/wishlist"""
+    items = await db.wishlist.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("added_at", -1).to_list(100)
+    return items
+
+@api_router.post("/wishlist", response_model=WishlistItem)
+async def add_to_wishlist(
+    product_url: str = Body(..., embed=True),
+    product_name: str = Body(None, embed=True),
+    product_image: str = Body(None, embed=True),
+    notes: str = Body(None, embed=True),
+    user: dict = Depends(get_current_user)
+):
+    """Add a product to wishlist"""
+    # Check if already in wishlist
+    existing = await db.wishlist.find_one({"user_id": user["id"], "product_url": product_url})
+    if existing:
+        raise HTTPException(status_code=400, detail="Product already in wishlist")
+    
+    item = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "product_url": product_url,
+        "product_name": product_name or "Saved Product",
+        "product_image": product_image,
+        "notes": notes,
+        "added_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.wishlist.insert_one(item)
+    del item["_id"] if "_id" in item else None
+    return item
+
+@api_router.delete("/wishlist/{item_id}")
+async def remove_from_wishlist(item_id: str, user: dict = Depends(get_current_user)):
+    """Remove a product from wishlist"""
+    result = await db.wishlist.delete_one({"id": item_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"message": "Removed from wishlist"}
+
+# ==================== COMPARISON ROUTES ====================
+
+@api_router.post("/compare")
+async def compare_products(data: ComparisonRequest, user: dict = Depends(get_current_user)):
+    """Compare 2-3 Amazon products side by side"""
+    if len(data.product_urls) < 2 or len(data.product_urls) > 3:
+        raise HTTPException(status_code=400, detail="Please provide 2-3 product URLs")
+    
+    # Check user's remaining checks
+    checks_needed = len(data.product_urls)
+    if user.get("subscription_type") == "free" and user.get("checks_remaining", 0) < checks_needed:
+        raise HTTPException(
+            status_code=403, 
+            detail=f"Not enough checks. Need {checks_needed}, have {user.get('checks_remaining', 0)}"
+        )
+    
+    # Analyze each product
+    comparisons = []
+    for url in data.product_urls:
+        # Check if already analyzed
+        existing = await db.product_analyses.find_one(
+            {"amazon_url": url, "user_id": user["id"]},
+            {"_id": 0}
+        )
+        
+        if existing:
+            comparisons.append(existing)
+        else:
+            # Analyze new product
+            try:
+                result = await analyze_amazon_product(url)
+                result["id"] = str(uuid.uuid4())
+                result["user_id"] = user["id"]
+                result["analyzed_at"] = datetime.now(timezone.utc).isoformat()
+                
+                await db.product_analyses.insert_one({**result, "_id": result["id"]})
+                
+                # Deduct check
+                if user.get("subscription_type") == "free":
+                    await db.users.update_one(
+                        {"id": user["id"]},
+                        {"$inc": {"checks_remaining": -1, "checks_used_this_month": 1}}
+                    )
+                
+                comparisons.append(result)
+            except Exception as e:
+                logging.error(f"Failed to analyze {url}: {e}")
+                comparisons.append({"error": str(e), "url": url})
+    
+    # Generate comparison summary
+    comparison_summary = generate_comparison_summary(comparisons)
+    
+    return {
+        "products": comparisons,
+        "comparison_summary": comparison_summary,
+        "winner": get_comparison_winner(comparisons)
+    }
+
+def generate_comparison_summary(products: List[dict]) -> dict:
+    """Generate a summary comparing the products"""
+    valid_products = [p for p in products if "error" not in p]
+    
+    if not valid_products:
+        return {"message": "Unable to compare products"}
+    
+    return {
+        "total_products": len(valid_products),
+        "verdicts": {p.get("product_name", "Unknown")[:30]: p.get("verdict") for p in valid_products},
+        "scores": {p.get("product_name", "Unknown")[:30]: p.get("confidence_score") for p in valid_products},
+        "best_score": max([p.get("confidence_score", 0) for p in valid_products]),
+        "worst_score": min([p.get("confidence_score", 0) for p in valid_products])
+    }
+
+def get_comparison_winner(products: List[dict]) -> dict:
+    """Determine the winner based on confidence score"""
+    valid_products = [p for p in products if "error" not in p and p.get("confidence_score")]
+    
+    if not valid_products:
+        return None
+    
+    winner = max(valid_products, key=lambda x: x.get("confidence_score", 0))
+    return {
+        "product_name": winner.get("product_name"),
+        "confidence_score": winner.get("confidence_score"),
+        "verdict": winner.get("verdict"),
+        "reason": f"Highest confidence score of {winner.get('confidence_score')}%"
+    }
+
 # ==================== PUBLIC INSIGHTS ROUTES ====================
 
 @api_router.get("/insights", response_model=List[ProductAnalysisResponse])
