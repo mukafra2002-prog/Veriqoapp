@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://veriqo.com/sitemap.xml
+
+# Disallow private/authenticated pages from indexing
+Disallow: /home
+Disallow: /account
+Disallow: /history
+Disallow: /wishlist
+Disallow: /compare
+Disallow: /admin
+Disallow: /results
+Disallow: /payment
