@@ -220,8 +220,8 @@ export default function LandingPage() {
               },
               {
                 step: '03',
-                title: 'Get Verdict',
-                description: 'Receive Buy/Think/Avoid score with key complaints highlighted',
+                title: 'Get Insights',
+                description: 'Receive Great Match/Good Match/Consider Options insights with key feedback highlighted',
                 icon: '✅',
                 gradient: 'from-emerald-600 to-teal-600'
               }
