@@ -25,16 +25,28 @@ export const ScoreGauge = ({ score, verdict, size = 180 }) => {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (animatedScore / 100) * circumference;
 
+  // Safe Core: Map both old and new verdict formats
+  const normalizeVerdict = (v) => {
+    const map = {
+      'buy': 'great_match', 'BUY': 'great_match', 'great_match': 'great_match',
+      'think': 'good_match', 'THINK': 'good_match', 'good_match': 'good_match',
+      'avoid': 'consider_options', 'AVOID': 'consider_options', 'consider_options': 'consider_options'
+    };
+    return map[v] || 'good_match';
+  };
+
+  const normalizedVerdict = normalizeVerdict(verdict);
+
   const getColor = () => {
-    if (verdict === 'buy') return '#10B981';
-    if (verdict === 'think') return '#F59E0B';
-    return '#EF4444';
+    if (normalizedVerdict === 'great_match') return '#10B981';
+    if (normalizedVerdict === 'good_match') return '#F59E0B';
+    return '#6366F1'; // Purple for consider_options (neutral, not alarming)
   };
 
   const getLabel = () => {
-    if (verdict === 'buy') return 'BUY';
-    if (verdict === 'think') return 'THINK';
-    return 'AVOID';
+    if (normalizedVerdict === 'great_match') return 'GREAT MATCH';
+    if (normalizedVerdict === 'good_match') return 'GOOD MATCH';
+    return 'CONSIDER OPTIONS';
   };
 
   return (
@@ -77,7 +89,16 @@ export const ScoreGauge = ({ score, verdict, size = 180 }) => {
 
       {/* Verdict Badge */}
       <div 
-        className={`verdict-badge ${verdict} mt-4`}
+        className={`verdict-badge ${normalizedVerdict} mt-4`}
+        style={{
+          backgroundColor: normalizedVerdict === 'great_match' ? 'rgba(16, 185, 129, 0.1)' :
+                          normalizedVerdict === 'good_match' ? 'rgba(245, 158, 11, 0.1)' :
+                          'rgba(99, 102, 241, 0.1)',
+          borderColor: normalizedVerdict === 'great_match' ? 'rgba(16, 185, 129, 0.3)' :
+                       normalizedVerdict === 'good_match' ? 'rgba(245, 158, 11, 0.3)' :
+                       'rgba(99, 102, 241, 0.3)',
+          color: getColor()
+        }}
         data-testid="verdict-badge"
       >
         {getLabel()}
