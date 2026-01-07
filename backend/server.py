@@ -1166,10 +1166,10 @@ async def get_admin_stats(admin: dict = Depends(get_admin_user)):
     total_analyses = await db.product_analyses.count_documents({})
     analyses_today = await db.product_analyses.count_documents({"analyzed_at": {"$gte": today.isoformat()}})
     
-    # Verdict distribution
-    verdict_buy = await db.product_analyses.count_documents({"verdict": "BUY"})
-    verdict_think = await db.product_analyses.count_documents({"verdict": "THINK"})
-    verdict_avoid = await db.product_analyses.count_documents({"verdict": "AVOID"})
+    # Verdict distribution (Safe Core naming)
+    verdict_great = await db.product_analyses.count_documents({"verdict": {"$in": ["great_match", "BUY", "buy"]}})
+    verdict_good = await db.product_analyses.count_documents({"verdict": {"$in": ["good_match", "THINK", "think"]}})
+    verdict_consider = await db.product_analyses.count_documents({"verdict": {"$in": ["consider_options", "AVOID", "avoid"]}})
     
     return {
         "total_users": total_users,
@@ -1178,9 +1178,9 @@ async def get_admin_stats(admin: dict = Depends(get_admin_user)):
         "premium_percentage": round((premium_users / total_users * 100) if total_users > 0 else 0, 1),
         "total_analyses": total_analyses,
         "analyses_today": analyses_today,
-        "verdict_buy": verdict_buy,
-        "verdict_think": verdict_think,
-        "verdict_avoid": verdict_avoid,
+        "verdict_great_match": verdict_great,
+        "verdict_good_match": verdict_good,
+        "verdict_consider_options": verdict_consider,
         "mrr": premium_users * 6.99,
         "revenue_today": 0
     }
