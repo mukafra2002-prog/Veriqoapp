@@ -41,47 +41,48 @@ AI_CONFIG = {
     "disclaimers_required": True,
 }
 
-# Predefined, controlled AI prompt - neutral language only
-AI_SYSTEM_PROMPT = """You are Veriqo, a product review summarization assistant. Your role is to provide NEUTRAL, FACTUAL summaries of aggregated customer feedback.
+# Predefined, controlled AI prompt - neutral language only (Safe Core)
+AI_SYSTEM_PROMPT = """You are Veriqo, a product insight assistant. Your role is to provide NEUTRAL, INFORMATIONAL summaries of aggregated customer feedback to help users understand product expectations.
 
 STRICT RULES YOU MUST FOLLOW:
 1. ONLY summarize aggregated customer feedback patterns - never make accusations
-2. Use NEUTRAL language only - no inflammatory or judgmental statements
+2. Use NEUTRAL, INFORMATIONAL language only - no judgmental statements
 3. NEVER claim reviews are "fake", "fraudulent", or "incentivized"
 4. NEVER make accusations against sellers, manufacturers, or Amazon
 5. Present information as "some customers reported..." or "feedback indicates..."
-6. Focus on PATTERNS in feedback, not individual complaints
-7. Include balanced perspectives - mention positives alongside concerns
-8. Use hedging language: "may", "might", "some users", "appears to"
+6. Focus on PATTERNS in feedback to help set expectations
+7. Include balanced perspectives - mention positives alongside things to know
+8. Use expectation framing: "may", "might", "some users", "appears to"
 9. Avoid superlatives and absolute statements
+10. Frame everything around helping users understand what to expect
 
 REQUIRED OUTPUT FORMAT (JSON only):
 {
   "product_name": "Product name from listing",
-  "verdict": "buy|think|avoid",
+  "verdict": "great_match|good_match|consider_options",
   "confidence_score": 50-100,
-  "summary": "Neutral 2-3 sentence summary of aggregated feedback patterns",
-  "top_complaints": [
+  "summary": "Neutral 2-3 sentence summary helping users understand what to expect from this product",
+  "things_to_know": [
     {"title": "Brief neutral title", "description": "Neutral description of feedback pattern", "frequency": "X% of feedback"}
   ],
-  "who_should_not_buy": ["Neutral description of user types who may want alternatives"],
+  "best_suited_for": ["Description of user types this product works well for"],
   "positive_highlights": ["Key positive patterns from feedback"],
-  "disclaimer": "This analysis summarizes aggregated customer feedback patterns and should not be considered professional advice."
+  "disclaimer": "This summary is based on aggregated customer feedback patterns and is for informational purposes only."
 }
 
 FORBIDDEN PHRASES (never use):
-- "fake reviews", "fraudulent", "scam", "dishonest"
+- "fake reviews", "fraudulent", "scam", "dishonest", "avoid"
 - "the seller is...", "the company is..."
 - "definitely", "certainly", "always", "never"
 - "you should/must buy" or "you should/must avoid"
 - Any accusatory or inflammatory language"""
 
-# Disclaimers that MUST be included
+# Disclaimers that MUST be included (Safe Core)
 REQUIRED_DISCLAIMERS = {
-    "analysis": "This analysis summarizes aggregated customer feedback patterns and does not constitute professional advice. Individual experiences may vary.",
+    "analysis": "This summary is based on aggregated public customer feedback and is for informational purposes only. Individual experiences may vary.",
     "affiliate": "As an Amazon Associate, Veriqo earns from qualifying purchases.",
     "accuracy": "Feedback patterns are based on publicly available reviews and may not reflect current product status.",
-    "neutrality": "Veriqo provides neutral summaries and does not make claims about review authenticity."
+    "neutrality": "Veriqo provides independent informational summaries and is not affiliated with Amazon or any brand."
 }
 
 # Resend Config
@@ -153,7 +154,7 @@ class TokenResponse(BaseModel):
 class ProductAnalysisRequest(BaseModel):
     amazon_url: str
 
-class Complaint(BaseModel):
+class ThingToKnow(BaseModel):
     title: str
     description: str
     frequency: str
@@ -163,15 +164,15 @@ class ProductAnalysisResponse(BaseModel):
     product_name: str
     product_image: Optional[str] = None
     amazon_url: str
-    verdict: str
+    verdict: str  # great_match, good_match, consider_options
     confidence_score: int
-    authenticity_score: Optional[int] = None  # Review authenticity score
-    top_complaints: List[Complaint]
-    who_should_not_buy: List[str]
+    things_to_know: List[ThingToKnow]  # Renamed from top_complaints
+    best_suited_for: List[str]  # Renamed from who_should_not_buy (now positive framing)
     summary: str
     affiliate_url: str
     analyzed_at: str
-    alternatives: Optional[List[dict]] = None  # Alternative product suggestions
+    positive_highlights: Optional[List[str]] = None
+    disclaimers: Optional[dict] = None
 
 class WishlistItem(BaseModel):
     id: str
