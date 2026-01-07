@@ -8,21 +8,30 @@ import axios from 'axios';
 import { 
   ArrowLeft, 
   ExternalLink, 
-  AlertTriangle, 
-  UserX, 
+  Info, 
+  UserCheck, 
   Shield, 
   Clock,
   Share2,
-  Bookmark,
   Heart,
   Loader2,
-  ShieldCheck,
   Sparkles,
-  ArrowRight
+  CheckCircle,
+  Lightbulb
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+
+// Safe Core: Helper to normalize verdict from old/new formats
+const normalizeVerdict = (v) => {
+  const map = {
+    'buy': 'great_match', 'BUY': 'great_match', 'great_match': 'great_match',
+    'think': 'good_match', 'THINK': 'good_match', 'good_match': 'good_match',
+    'avoid': 'consider_options', 'AVOID': 'consider_options', 'consider_options': 'consider_options'
+  };
+  return map[v] || 'good_match';
+};
 
 export default function ResultsPage() {
   const { id } = useParams();
@@ -91,13 +100,6 @@ export default function ResultsPage() {
     }
   };
 
-  const getAuthenticityLabel = (score) => {
-    if (score >= 80) return { label: 'Highly Trustworthy', color: 'text-emerald-400' };
-    if (score >= 60) return { label: 'Mostly Reliable', color: 'text-blue-400' };
-    if (score >= 40) return { label: 'Mixed Signals', color: 'text-amber-400' };
-    return { label: 'Use Caution', color: 'text-red-400' };
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950">
@@ -117,14 +119,36 @@ export default function ResultsPage() {
 
   if (!analysis) return null;
 
+  // Safe Core: Get normalized verdict and use new field names with fallbacks
+  const normalizedVerdict = normalizeVerdict(analysis.verdict);
+  const thingsToKnow = analysis.things_to_know || analysis.top_complaints || [];
+  const bestSuitedFor = analysis.best_suited_for || analysis.who_should_not_buy || [];
+  const positiveHighlights = analysis.positive_highlights || [];
+
   const getVerdictDescription = () => {
-    if (analysis.verdict === 'buy') {
-      return 'This product has strong positive reviews and is recommended for purchase.';
+    if (normalizedVerdict === 'great_match') {
+      return 'Based on customer feedback patterns, this product appears to meet expectations for most users.';
     }
-    if (analysis.verdict === 'think') {
-      return 'This product has mixed reviews. Consider the complaints before purchasing.';
+    if (normalizedVerdict === 'good_match') {
+      return 'This product has mixed feedback. Review the insights below to see if it matches your needs.';
     }
-    return 'This product has significant issues. We recommend looking for alternatives.';
+    return 'Consider reviewing the feedback patterns carefully to determine if this product suits your specific requirements.';
+  };
+
+  const getVerdictStyles = () => {
+    if (normalizedVerdict === 'great_match') {
+      return 'bg-emerald-500/10 border border-emerald-500/20';
+    }
+    if (normalizedVerdict === 'good_match') {
+      return 'bg-amber-500/10 border border-amber-500/20';
+    }
+    return 'bg-indigo-500/10 border border-indigo-500/20';
+  };
+
+  const getVerdictTextColor = () => {
+    if (normalizedVerdict === 'great_match') return 'text-emerald-400';
+    if (normalizedVerdict === 'good_match') return 'text-amber-400';
+    return 'text-indigo-400';
   };
 
   return (
@@ -150,7 +174,7 @@ export default function ResultsPage() {
           <div className="flex items-center gap-4 text-sm text-slate-500">
             <span className="flex items-center gap-1.5">
               <Shield className="w-4 h-4 text-blue-400" />
-              Verified by AI
+              AI-Powered Insight
             </span>
             <span className="flex items-center gap-1.5">
               <Clock className="w-4 h-4" />
@@ -165,7 +189,7 @@ export default function ResultsPage() {
           <div className="bento-score bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center" data-testid="score-card">
             <ScoreGauge score={analysis.confidence_score} verdict={analysis.verdict} />
             <p className="text-sm text-slate-500 mt-4 text-center">
-              Based on verified customer reviews
+              Based on aggregated customer feedback
             </p>
           </div>
 
@@ -173,37 +197,29 @@ export default function ResultsPage() {
           <div className="bento-verdict bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="verdict-card">
             <h2 className="text-lg font-semibold text-white mb-4">Summary</h2>
             <p className="text-slate-400 mb-6">{analysis.summary}</p>
-            <div className={`p-4 rounded-xl ${
-              analysis.verdict === 'buy' ? 'bg-emerald-500/10 border border-emerald-500/20' :
-              analysis.verdict === 'think' ? 'bg-amber-500/10 border border-amber-500/20' :
-              'bg-red-500/10 border border-red-500/20'
-            }`}>
-              <p className={`text-sm ${
-                analysis.verdict === 'buy' ? 'text-emerald-400' :
-                analysis.verdict === 'think' ? 'text-amber-400' :
-                'text-red-400'
-              }`}>
+            <div className={`p-4 rounded-xl ${getVerdictStyles()}`}>
+              <p className={`text-sm ${getVerdictTextColor()}`}>
                 {getVerdictDescription()}
               </p>
             </div>
           </div>
 
-          {/* Complaints Card */}
-          <div className="bento-complaints bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="complaints-card">
+          {/* Things to Know Card (formerly Complaints) */}
+          <div className="bento-complaints bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="things-to-know-card">
             <div className="flex items-center gap-2 mb-4">
-              <AlertTriangle className="w-5 h-5 text-amber-400" />
-              <h2 className="text-lg font-semibold text-white">Top 3 Complaints</h2>
+              <Lightbulb className="w-5 h-5 text-amber-400" />
+              <h2 className="text-lg font-semibold text-white">Things to Know</h2>
             </div>
             <div className="space-y-4">
-              {analysis.top_complaints.map((complaint, idx) => (
-                <div key={idx} className="p-4 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-colors" data-testid={`complaint-${idx}`}>
+              {thingsToKnow.map((item, idx) => (
+                <div key={idx} className="p-4 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-colors" data-testid={`thing-to-know-${idx}`}>
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h3 className="font-semibold text-white mb-1">{complaint.title}</h3>
-                      <p className="text-sm text-slate-400">{complaint.description}</p>
+                      <h3 className="font-semibold text-white mb-1">{item.title}</h3>
+                      <p className="text-sm text-slate-400">{item.description}</p>
                     </div>
                     <span className="text-xs font-medium text-slate-500 bg-white/5 px-2 py-1 rounded-full whitespace-nowrap">
-                      {complaint.frequency}
+                      {item.frequency}
                     </span>
                   </div>
                 </div>
@@ -211,84 +227,57 @@ export default function ResultsPage() {
             </div>
           </div>
 
-          {/* Who Should Not Buy */}
-          <div className="bento-full bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="who-should-not-buy">
+          {/* Best Suited For (formerly Who Should NOT Buy - now positive framing) */}
+          <div className="bento-full bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="best-suited-for">
             <div className="flex items-center gap-2 mb-4">
-              <UserX className="w-5 h-5 text-red-400" />
-              <h2 className="text-lg font-semibold text-white">Who Should NOT Buy This</h2>
+              <UserCheck className="w-5 h-5 text-emerald-400" />
+              <h2 className="text-lg font-semibold text-white">Best Suited For</h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {analysis.who_should_not_buy.map((item, idx) => (
+              {bestSuitedFor.map((item, idx) => (
                 <div 
                   key={idx} 
-                  className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl"
-                  data-testid={`not-buy-${idx}`}
+                  className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl"
+                  data-testid={`suited-for-${idx}`}
                 >
-                  <div className="w-2 h-2 bg-red-400 rounded-full flex-shrink-0"></div>
-                  <span className="text-sm text-red-300">{item}</span>
+                  <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span className="text-sm text-emerald-300">{item}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Review Authenticity Score */}
-          {analysis.authenticity_score && (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="authenticity-card">
+          {/* Positive Highlights */}
+          {positiveHighlights.length > 0 && (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="positive-highlights">
               <div className="flex items-center gap-2 mb-4">
-                <ShieldCheck className="w-5 h-5 text-blue-400" />
-                <h2 className="text-lg font-semibold text-white">Review Authenticity</h2>
+                <Sparkles className="w-5 h-5 text-blue-400" />
+                <h2 className="text-lg font-semibold text-white">Positive Feedback Patterns</h2>
               </div>
-              <div className="flex items-center gap-6">
-                <div className="relative w-24 h-24">
-                  <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-slate-700" strokeWidth="8"/>
-                    <circle 
-                      cx="50" cy="50" r="42" fill="none" 
-                      stroke={analysis.authenticity_score >= 70 ? '#10B981' : analysis.authenticity_score >= 40 ? '#F59E0B' : '#EF4444'} 
-                      strokeWidth="8" strokeLinecap="round" 
-                      strokeDasharray="264" 
-                      strokeDashoffset={264 - (264 * analysis.authenticity_score / 100)}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-white">{analysis.authenticity_score}%</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <p className={`font-semibold ${getAuthenticityLabel(analysis.authenticity_score).color}`}>
-                    {getAuthenticityLabel(analysis.authenticity_score).label}
-                  </p>
-                  <p className="text-slate-400 text-sm mt-1">
-                    Our AI analyzes review patterns, language, and timing to detect potential fake or incentivized reviews.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Alternative Suggestions */}
-          {analysis.alternatives && analysis.alternatives.length > 0 && (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6" data-testid="alternatives-card">
-              <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="w-5 h-5 text-purple-400" />
-                <h2 className="text-lg font-semibold text-white">Consider These Alternatives</h2>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {analysis.alternatives.map((alt, idx) => (
+              <div className="grid sm:grid-cols-2 gap-3">
+                {positiveHighlights.map((highlight, idx) => (
                   <div 
                     key={idx}
-                    className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-xl"
+                    className="flex items-center gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl"
                   >
-                    <h3 className="font-semibold text-white mb-1">{alt.name}</h3>
-                    <p className="text-slate-400 text-sm">{alt.reason}</p>
+                    <CheckCircle className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <span className="text-sm text-blue-300">{highlight}</span>
                   </div>
                 ))}
               </div>
-              <p className="text-slate-500 text-xs mt-4">
-                Search Amazon for these alternatives to find products with better reviews.
-              </p>
             </div>
           )}
+        </div>
+
+        {/* Disclaimer */}
+        <div className="bg-slate-800/30 border border-white/5 rounded-xl p-4 mb-8">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-slate-500 flex-shrink-0 mt-0.5" />
+            <div className="text-xs text-slate-500 space-y-1">
+              <p>This summary is based on aggregated public customer feedback and is for informational purposes only.</p>
+              <p>Veriqo provides independent informational summaries and is not affiliated with Amazon or any brand.</p>
+            </div>
+          </div>
         </div>
 
         {/* Action Buttons */}
@@ -298,10 +287,10 @@ export default function ResultsPage() {
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 h-14 px-8 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-semibold shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all hover:scale-105"
-            data-testid="buy-on-amazon-btn"
+            data-testid="view-on-amazon-btn"
           >
             <ExternalLink className="w-5 h-5" />
-            Buy on Amazon
+            View on Amazon
           </a>
           
           <Button
