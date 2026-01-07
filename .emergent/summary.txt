@@ -1,194 +1,227 @@
-<analysis>**original_problem_statement:** The user wants to build a smart Amazon shopping assistant named Veriqo. The application should allow users to paste an Amazon product link and receive a Buy / Think / Avoid score. The analysis must include the top 3 complaints from verified reviews and a who should not buy section. The app needs a Buy on Amazon button with affiliate tracking.
+<analysis>**original_problem_statement:** The user wants to build a smart Amazon shopping assistant named Veriqo. The application should allow users to paste an Amazon product link and receive an analysis. The business model is freemium with multiple subscription tiers for individual shoppers and businesses.
 
-The business model is freemium:
-- **Free Tier:** Limited number of checks per month.
-- **Premium Tier:** Unlimited checks and additional features via a subscription.
-
-Later, the user provided a new roadmap () which expanded the scope to include:
-- **New Pricing Tiers:** Business Starter, Business Pro, and Enterprise plans in addition to the existing Free and Premium plans for individual shoppers.
-- **New Features:** Check history saving, CSV export, and team management.
-- **Enterprise Features:** A dedicated campaign management dashboard and analytics.
-- **UI Updates:** The landing page and pricing page must be updated to reflect these new offerings.
+Over the session, the user expanded the scope significantly, requesting:
+- A full-stack application with JWT and Google authentication.
+- A stunning dark-themed UI.
+- New features from a roadmap PDF: check history, CSV export, and team management (UI stubs for pricing were implemented).
+- Specific informational pages for Shoppers and Sellers.
+- Public, SEO-friendly Product Insight Pages to attract organic traffic, with a free/paid content model.
+- A comprehensive Admin Dashboard to view users, analyses, and platform statistics.
+- AI usage controls (caching, prompts, token limits, kill switch) managed from the admin dashboard.
+- New features including a Product Comparison tool, a Wishlist, Review Authenticity Score, and Alternative Product Suggestions.
+- A request to prepare the app for Vercel deployment, which was later rescinded in favor of staying on the Emergent platform.
+- A final, critical request to implement safety changes: remove risky features like fake review detection and reframe negative language (e.g., Complaints -> Things to Know, AVOID -> Consider Options) to make the app safer and less confrontational.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack React/FastAPI application with a MongoDB database.
-- **Authentication:** Supports JWT-based email/password registration and Emergent-managed Google social login. A Forgot Password flow is implemented using Resend, but it requires an API key to be functional. Phone login was implemented with Twilio and then removed at the user's request.
-- **Core Feature:** Users can submit an Amazon URL. The backend attempts to scrape the page using BeautifulSoup; if it fails, it falls back to an AI-driven analysis using OpenAI based on the product ASIN. Results are displayed in a bento-grid layout.
-- **Billing:** A freemium model is in place (3 free checks/month). Stripe integration is set up for a single premium plan for individual shoppers.
-- **UI:** The application features a stunning dark-themed UI with custom fonts and animations. The landing page and pricing page have been visually updated to display the new multi-tier business plans, but the backend logic to support them is not yet implemented.
+A feature-rich full-stack React/FastAPI application with a MongoDB database.
+- **Authentication:** Supports JWT email/password and Emergent-managed Google login. A Forgot Password flow exists but requires a Resend API key to be functional.
+- **Core Features:**
+    - AI-powered analysis of Amazon products.
+    - **History Page ():** View past analyses with CSV export.
+    - **Wishlist Page ():** Save products for later.
+    - **Comparison Page ():** Compare 2-3 products side-by-side.
+    - **Public Insight Pages ():** SEO-optimized pages showing a single featured analysis to drive sign-ups. The individual insight pages () have a detailed free/paid content structure.
+- **User-Specific Pages:**
+    - **Shoppers Page ():** Highlights benefits for individual consumers.
+    - **Sellers Page ():** Focuses on competitor analysis for brands.
+- **Admin Dashboard ():** A protected route for admins showing platform statistics (users, analyses, revenue), user lists, and controls for AI features (enable/disable, token limits, caching).
+- **Billing:** Freemium model (3 free checks/month) with Stripe integration for a single premium plan. UI for new business plans exists, but backend logic is not implemented.
+- **Legal Pages:** Placeholder files for Privacy Policy and Terms of Service exist but are not populated with content.
 
 **Last working item**:
-- **Last item agent was working:** The agent was implementing features from the user's new roadmap (). It had just updated the frontend  and  to visually display the new business pricing tiers and was in the process of verifying these changes. A screenshot confirmed the top of the landing page was updated, but the agent was interrupted before it could verify the rest of the page (e.g., by scrolling down).
-- **Status:** IN PROGRESS
-- **Agent Testing Done:** Y (Partial, via screenshot of the top of the page)
-- **Which testing method agent to use?**: screenshot tool
+- **Last item agent was working:** The agent was about to begin implementing critical safety changes requested by the user to make the app's language more neutral and reduce legal risk. This involves removing the Authenticity Score and reframing negative terms like AVOID and Complaints.
+- **Status:** NOT STARTED
+- **Agent Testing Done:** N
+- **Which testing method agent to use?**: both
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1:** Google Auth returns a non-standard success status code. (Priority: P2 - Low)
-- **Issue 2:** Session persistence sometimes fails on direct navigation to protected routes. (Priority: P1 - Medium)
+- **Issue 1:** Implement Safety Refactoring (P0)
+- **Issue 2:** Session persistence on direct navigation (P1)
+- **Issue 3:** Google Auth returns a non-standard success status code (P2)
 
 **Issues Detail:**
-- **Issue 1:** Google Auth session status code
-    - **Attempted fixes:** None. This was noted in the last test report () as a low-priority backend issue.
+- **Issue 1:** Implement Safety Refactoring
+    - **Attempted fixes:** None. The agent agreed to the user's request but has not started implementation.
+    - **Next debug checklist:**
+        1.  **Backend ():**
+            -   Modify the  function's prompt to remove any mention of fake reviews or authenticity.
+            -   Update the Pydantic models (, ) to remove .
+            -   Modify the logic that generates the  to use Great Match, Good Match, Consider Options instead of BUY, THINK, AVOID.
+        2.  **Frontend ():**
+            -   Remove the Authenticity Score component from .
+            -   Update text in : Change Top Complaints to Things to Know and Who Should NOT Buy to Best Suited For.
+            -   Update the verdict display logic across all relevant components (, , etc.) to show the new, reframed verdicts.
+    - **Why fix this issue and what will be achieved with the fix?** To align the app with the user's latest request for a safer, more neutral tone, reducing potential legal risks associated with making definitive negative claims.
+    - **Status:** NOT STARTED
+    - **Is recurring issue?** N
+    - **Should Test frontend/backend/both after fix?** both
+    - **Blocked on other issue:** None
+
+- **Issue 2:** Session persistence on direct navigation
+    - **Attempted fixes:** The agent implemented a fix in  and  by introducing an  state. The testing agent confirmed the fix, but this was a recurring issue in the past. It needs careful user verification.
+    - **Next debug checklist:**
+        - Manually test by logging in, then closing the tab, opening a new tab, and navigating directly to a protected route like  or .
+        - Review  and the  component in  to ensure there are no race conditions on app load.
+    - **Why fix this issue and what will be achieved with the fix?** Improves user experience by allowing authenticated users to directly access protected pages without being redirected to login.
+    - **Status:** USER VERIFICATION PENDING
+    - **Is recurring issue?** Y
+    - **Should Test frontend/backend/both after fix?** frontend
+    - **Blocked on other issue:** None
+
+- **Issue 3:** Google Auth session status code
+    - **Attempted fixes:** None.
     - **Next debug checklist:**
         - Check the  route in .
-        - Ensure the response on successful token exchange returns a standard HTTP 200 or similar, and that the client-side logic in  handles it correctly.
+        - Ensure the response on successful token exchange returns a standard HTTP 200.
     - **Why fix this issue and what will be achieved with the fix?** To adhere to API best practices and prevent potential silent failures in the frontend.
     - **Status:** NOT STARTED
     - **Is recurring issue?** N
     - **Should Test backend/both after fix?** backend
     - **Blocked on other issue:** None
 
-- **Issue 2:** Session persistence on direct navigation
-    - **Attempted fixes:** The agent previously attempted a fix in the  component but the issue was still reported in the last test run ().
-    - **Next debug checklist:**
-        - Review  to analyze how the user state and loading status are managed on app initialization.
-        - Examine the  logic in  to identify the race condition between checking authentication status and rendering the child component.
-    - **Why fix this issue and what will be achieved with the fix?** To improve user experience by allowing authenticated users to directly access protected pages without being redirected to login.
-    - **Status:** NOT STARTED
-    - **Is recurring issue?** Y
-    - **Should Test frontend/backend/both after fix?** frontend
-    - **Blocked on other issue:** None
-
 **In progress Task List**:
-- **Task 1:** Complete verification of the updated landing page. (Priority: P0)
-    - **Where to resume:** Use the  tool to capture the entire  page, including the new business pricing sections, to confirm they render correctly.
-    - **What will be achieved with this?** Confirmation that the initial UI work for the new roadmap is complete, unblocking backend implementation.
-    - **Status:** IN PROGRESS
-    - **Should Test frontend/backend/both after fix?** frontend
-    - **Blocked on something:** No
+None. The main pending work is captured in the issue list above.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-    - **P0:** Implement Backend for New Pricing Plans: Add new Stripe Price IDs for Business Starter, Pro, and Enterprise tiers to  and update the Stripe checkout logic in .
-    - **P0:** Implement Check History: Create a new page  to display a list of all past analyses for the user. The data is already being saved in the  collection.
-    - **P1:** Implement CSV Export: In the new , add a button that triggers a new backend endpoint () to generate and download a CSV of the user's analysis history.
-    - **P1:** Add Resend API Key: Ask the user for their Resend API key and add it to  to make the forgot password feature fully functional.
-    - **P1:** Implement Team Management: Design and build the UI and backend logic for business plan users to invite and manage team members. This will require new DB schema and API endpoints.
+    - **P0:** Implement Price Drop Alerts.
+    - **P0:** Populate  and  with content.
+    - **P0:** Implement backend logic for new Stripe Business pricing plans.
+    - **P1:** Ask user for  and add to  to enable the Forgot Password feature.
+    - **P1:** Begin backend work for a Chrome Browser Extension (user's top requested feature).
 
 - **Future Tasks:**
-    - **P2:** Implement Enterprise Campaign Dashboard.
-    - **P2:** Implement Analytics View.
-    - **P2:** Improve Amazon Scraping: Replace the current  implementation with a more robust third-party scraping API (as researched by the agent) to improve reliability and data extraction quality.
+    - **P2:** AI Shopping Assistant Chat.
+    - **P2:** Social Proof & User Reviews feature.
+    - **P2:** Category Leaderboard pages.
+    - **P2:** Team Management for business plans.
+    - **P2:** Enterprise Campaign Dashboard and Analytics.
+    - **P2:** Improve Amazon Scraping (replace BeautifulSoup with a robust API).
+    - **P2:** Bulk Analysis (CSV upload for business users).
+    - **P2:** API Access for developers.
 
 **Completed work in this session**
-- **MVP Implementation:** Built the core full-stack application with a freemium model, JWT authentication, and Stripe integration for a single premium plan.
-- **UI/UX Overhaul:** Implemented a stunning dark-themed UI with advanced CSS, animations, and custom fonts.
-- **Google Authentication:** Integrated Emergent-managed Google social login.
-- **Forgot Password Flow:** Implemented the backend logic and frontend pages for password resets via email (pending API key).
-- **Amazon Scraping (v1):** Added a basic product data scraping feature using  with a fallback to pure AI analysis.
-- **Feature Removal:** Removed the phone number login feature as requested by the user.
-- **Roadmap UI Update:** Updated the landing and pricing pages to visually represent the new multi-tier business plans.
+- **Core Feature Expansion:**
+  - Implemented  with search, filtering, and CSV export.
+  - Implemented  and  with full backend and frontend logic.
+  - Implemented  with an advanced free/paid content structure and SEO optimizations.
+  - Implemented  with stats, user/analysis management, and AI controls.
+- **Informational Pages:** Created and designed  and .
+- **AI Controls:** Built backend and frontend for an admin-controlled AI safety system (caching, enable/disable toggle, token limits).
+- **Bug Fixes:**
+  - Resolved an issue where the product analyzer appeared broken because the user had 0 checks remaining.
+  - Fixed multiple syntax and import errors in the backend during development.
+  - Attempted a fix for the recurring session persistence issue, which passed automated tests.
+- **UI/UX:** Added links for all new pages to the  and . Updated the  to show new data points (some of which are now being removed/reframed).
 
 **Earlier issues found/mentioned but not fixed**
-- **Issue 1:** Google Auth returns a non-standard success status code.
-    - **Debug checklist:** Check  at  and  for response handling.
-    - **Why to solve this issue and what will be achieved with this?** Follows API best practices and ensures robust frontend handling.
-    - **Should Test frontend/backend/both after fix:** backend
-    - **Is recurring issue?** N
-- **Issue 2:** Session persistence fails on direct navigation.
-    - **Debug checklist:** Review  and the  in  for race conditions.
-    - **Why to solve this issue and what will be achieved with this?** Improves UX by preventing unnecessary redirects for logged-in users.
-    - **Should Test frontend/backend/both after fix:** frontend
-    - **Is recurring issue?** Y
+- **Issue 1:** Google Auth returns a non-standard success status code. (Details in All Pending/In progress Issue list)
+- **Issue 2:** Session persistence fails on direct navigation. (Details in All Pending/In progress Issue list)
 
 **Known issue recurrence from previous fork**
-- None.
+- **Issue:** Session persistence on direct navigation.
+- **Recurrence count:** 2+
+- **Status:** USER VERIFICATION PENDING. The agent believes it is fixed, but given its history, it requires manual user validation.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Backend:** FastAPI, MongoDB (motor), Pydantic, JWT
-- **Frontend:** React, React Router, Tailwind CSS, Shadcn/UI, Axios
-- **Integrations:** Stripe (Payments), OpenAI (AI Analysis), Google Auth, Resend (Email), BeautifulSoup (Web Scraping)
-- **Architecture:** Single-server monolith backend, SPA frontend.
+- **Backend:** FastAPI, MongoDB (motor), Pydantic, JWT, BeautifulSoup4, Resend
+- **Frontend:** React, React Router, Tailwind CSS, Shadcn/UI, Axios, 
+- **Integrations:** Stripe (Payments), OpenAI (AI Analysis), Emergent-managed Google Auth
+- **Architecture:** Monolithic backend, SPA frontend.
 
 **key DB schema**
 - **users:** 
 - **product_analyses:** 
 - **password_resets:** 
+- **ai_settings:**  (e.g., key='ai_enabled', value='true')
 
 **changes in tech stack**
-- No major changes to the core stack. Added , , and  (though Twilio usage was removed) to the backend.
+- Added  for SEO on public pages.
 
 **All files of reference**
-- : The single source of truth for all backend logic, including auth, analysis, and payments. Has been heavily modified.
-- : Updated to a stunning design and again to add new business pricing tiers.
-- : Updated to include various auth methods (Google, Email) and had Phone login removed.
-- : Updated to show new business plans.
-- : Updated to handle Google login.
-- : Updated with all new routes for auth and other pages.
-- : Contains the product requirements and a log of completed work.
-- : Playbook for testing authentication flows.
+- **New Files:**
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+- **Heavily Modified Files:**
+  - : Grew substantially with many new endpoints and logic for all new features.
+  - : Added routes for all new pages.
+  - : Added links to new pages.
+  - : Modified to include new analysis data.
+  - : Updated to attempt a fix for session persistence.
 
 **Areas that need refactoring**:
--  is becoming a large monolith. Future work could involve splitting the logic into routers and services (e.g., , ).
+-  is now extremely large and difficult to maintain. It should be broken down into multiple files using FastAPI's  for different concerns (e.g., , , ).
 
 **key api endpoints**
+-  & 
+-  & 
+- , , 
 - 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
+- , , 
+- , 
 
 **Critical Info for New Agent**
-- **Amazon Scraping is a fallback system:** The current implementation with  is not very reliable and is designed to fail gracefully, allowing the AI to proceed with analysis using just the ASIN. Do not treat it as a robust scraper.
-- **Resend requires an API Key:** The Forgot Password feature is fully coded but will not send emails until a valid  is added to the  file. You will need to ask the user for this key.
-- **New Roadmap:** The user has provided a new, more ambitious roadmap. The current implementation only includes the visual stubs for this roadmap on the landing/pricing pages. All backend logic and new feature pages (history, team management, etc.) are yet to be built.
+- **Priority #1:** The immediate task is to implement the safety changes as requested by the user. This is a critical refactor of the app's core language and features.
+- **Resend API Key:** The Forgot Password feature is coded but non-functional. You must ask the user for their .
+- **Deployment:** The user considered moving to Vercel but decided to stay on Emergent. Do not bring up deployment migration again.
+- **Chrome Extension:** This is a high-priority user request. The backend endpoints can be built, but the agent should inform the user that the extension itself is a separate project type that may need to be handled differently.
+- **Test Credentials:** Use  / . This user is an admin.
 
 **documents and test reports created in this job**
-- 
-- 
-- 
-- 
-- 
+-  (updated)
 - 
 
 **Last 10 User Messages and any pending HUMAN messages**
-10.  (with roadmap PDF) - User wants to implement the new roadmap. (In Progress)
-9.  - User confirmed they want both Resend integration and Amazon scraping. (Completed)
-8.  - User confirming prompt to move forward.
-7.  - User confirming prompt to move forward.
-6.  - User requested to remove the phone login feature. (Completed)
-5.  - User requested a UI overhaul and new auth methods. (Completed)
-4. 
-3.  (agent message)
-2.  (repeat)
-1.  (agent message)
+10.  - User confirms the agent should proceed with implementing the safety changes. (IN PROGRESS)
+9.   - User asking for advice on making the app safer. (Completed)
+8.   - User requests removal of fake review detection. (In Progress)
+7.   - User requests implementation of Chrome Extension and Price Drop Alerts. (Pending)
+6.   - User asks for feature ideas. (Completed)
+5.   - User chooses to keep the app on the Emergent platform instead of migrating to Vercel. (Completed)
+4.   - User asks for advice on Vercel deployment. (Completed)
+3.   - User provides new deployment requirements. (Superseded)
+2.   - User requests Privacy and Terms pages. (In Progress - files created, content pending)
+1.   - User prompt to continue.
 
 **Project Health Check:**
-- **Working:** Core application, JWT Auth, Google Auth, UI, Freemium logic.
-- **Mocked:** The Amazon scraper is a best-effort implementation and often fails, which is the intended fallback behavior. The Resend integration is mocked as it's missing the API key.
+- **Working:** Core analysis, Auth (JWT/Google), History, Wishlist, Comparison, Public Insights, Admin Dashboard, AI Controls.
+- **Broken:** None.
+- **Mocked:** The Forgot Password feature is mocked as it's missing the .
 
 **3rd Party Integrations**
 - **OpenAI GPT-4o**: For review analysis - uses Emergent LLM Key.
-- **Stripe**: For subscriptions - uses a pre-configured test key from the environment.
+- **Stripe**: For subscriptions - uses a pre-configured test key.
 - **Emergent-managed Google Auth**: For social login.
 - **Resend**: For password reset emails - requires User API Key.
-- **BeautifulSoup4**: For web scraping.
+- **BeautifulSoup4**: For basic web scraping.
 
 **Testing status**
 - **Testing agent used after significant changes:** YES
 - **Troubleshoot agent used after agent stuck in loop:** NO
 - **Test files created:** None
-- **Known regressions:**
-    - Session persistence on direct navigation appears to be a regression or an incompletely fixed bug.
+- **Known regressions:** Session persistence on direct navigation is a known recurring issue that needs careful user validation.
 
 **Credentials to test flow:**
-Use the registration flow to create a new user or use the following existing test user (password is 'password'):
 - **Email:** 
 - **Password:** 
-Note: This user may have exhausted their free checks. You can reset it with the mongo command: 
+- **Role:** This user has been granted admin privileges.
 
 **What agent forgot to execute**
-- The agent has not yet asked the user to provide the  which is necessary to make the forgot password feature functional.
-- The agent implemented the  function but did not add comprehensive error handling or logging for different HTTP status codes or HTML parsing errors from Amazon, which could make debugging difficult.</analysis>
+- The agent has not yet started the safety refactoring which was the last confirmed user request.
+- The agent has not populated the  and  files with content.
+- The agent still has not asked the user for the  required for the Forgot Password feature.
+- The agent has not started work on the user-prioritized Price Drop Alerts and Chrome Browser Extension features.</analysis>
