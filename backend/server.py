@@ -977,23 +977,42 @@ async def export_history(user: dict = Depends(get_current_user)):
     output = io.StringIO()
     writer = csv.writer(output)
     
-    # Header
+    # Header (Safe Core naming)
     writer.writerow([
         "Product Name", "Verdict", "Score", "Summary", 
-        "Top Complaints", "Who Should Not Buy", "Amazon URL", "Analyzed At"
+        "Things to Know", "Best Suited For", "Amazon URL", "Analyzed At"
     ])
     
     # Data rows
     for analysis in analyses:
-        complaints = "; ".join([c.get("title", "") for c in analysis.get("top_complaints", [])])
-        who_not = "; ".join(analysis.get("who_should_not_buy", []))
+        # Support both old and new field names
+        things_to_know = analysis.get("things_to_know") or analysis.get("top_complaints", [])
+        best_suited_for = analysis.get("best_suited_for") or analysis.get("who_should_not_buy", [])
+        
+        things_list = "; ".join([c.get("title", "") for c in things_to_know])
+        suited_list = "; ".join(best_suited_for)
+        
+        # Map old verdicts to new display names
+        verdict = analysis.get("verdict", "")
+        verdict_display = {
+            "great_match": "Great Match",
+            "good_match": "Good Match", 
+            "consider_options": "Consider Options",
+            "BUY": "Great Match",
+            "buy": "Great Match",
+            "THINK": "Good Match",
+            "think": "Good Match",
+            "AVOID": "Consider Options",
+            "avoid": "Consider Options"
+        }.get(verdict, verdict)
+        
         writer.writerow([
             analysis.get("product_name", ""),
-            analysis.get("verdict", ""),
+            verdict_display,
             analysis.get("confidence_score", ""),
             analysis.get("summary", ""),
-            complaints,
-            who_not,
+            things_list,
+            suited_list,
             analysis.get("amazon_url", ""),
             analysis.get("analyzed_at", "")
         ])
