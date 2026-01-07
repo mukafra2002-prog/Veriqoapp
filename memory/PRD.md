@@ -3,7 +3,7 @@
 ## Problem Statement
 Build Veriqo - a smart Amazon shopping assistant with stunning landing page, Google & email authentication, forgot password, real Amazon product scraping, and AI-powered review analysis.
 
-**Updated: January 2025** - Implemented "Safe Core" refactoring to make app language more neutral and reduce legal risk.
+**Updated: January 2025** - Implemented "Safe Core" refactoring and pre-launch checklist items.
 
 ## User Personas
 1. **Casual Shopper** - Wants quick insights before purchasing
@@ -30,32 +30,57 @@ Build Veriqo - a smart Amazon shopping assistant with stunning landing page, Goo
 - **No authenticity scoring** - removed fake review detection
 - **Required disclaimers** - automatically added to all AI outputs
 
+## Pre-Launch Checklist (Completed Jan 7, 2025)
+
+### ✅ Legal & Trust Pages
+- [x] Privacy Policy (/privacy)
+- [x] Terms of Service (/terms)
+- [x] Disclaimer (/disclaimer)
+- [x] Trust & Transparency (/trust)
+
+### ✅ Contact & Support
+- [x] Contact page (/contact) with support@veriqo.com
+- [x] FAQ page (/faq) with searchable questions
+
+### ✅ Tech Setup
+- [x] Google Analytics installed (G-518729566)
+- [x] Sitemap.xml generated
+- [x] Robots.txt configured
+- [x] SSL active (via Emergent platform)
+
+### ✅ Monetization Ready
+- [x] Affiliate disclosure visible in footer
+- [x] Amazon affiliate links working
+- [x] Stripe subscription checkout
+- [x] Free vs paid limits clear
+
 ## What's Been Implemented
-- [x] Stunning dark-themed landing page with animations (Dec 29, 2024)
-- [x] Google OAuth via Emergent Auth (Dec 29, 2024)
-- [x] Email/Password authentication with JWT (Dec 29, 2024)
-- [x] Forgot password with email reset (Resend-ready) (Dec 29, 2024)
-- [x] Amazon product scraping with BeautifulSoup (Dec 29, 2024)
-- [x] AI-powered analysis using OpenAI GPT-4o-mini (Dec 29, 2024)
-- [x] Results page with score gauge, feedback insights, verdict (Dec 29, 2024)
-- [x] Pricing page with Stripe integration (Dec 29, 2024)
-- [x] Account page with subscription status (Dec 29, 2024)
-- [x] Usage limits and subscription enforcement (Dec 29, 2024)
-- [x] Multi-tier pricing UI (Shoppers + Business plans) (Dec 29, 2024)
-- [x] History Page with stats, search, filters (Dec 29, 2024)
-- [x] CSV Export API for Premium/Business users (Dec 29, 2024)
-- [x] Session persistence fix (Dec 29, 2024)
-- [x] Wishlist feature (Jan 2025)
-- [x] Product Comparison tool (Jan 2025)
-- [x] Public Insight Pages with SEO (Jan 2025)
-- [x] Admin Dashboard with AI controls (Jan 2025)
-- [x] **Safe Core Refactoring** (Jan 7, 2025):
-  - Verdicts: BUY → Great Match, THINK → Good Match, AVOID → Consider Options
-  - "Top Complaints" → "Things to Know"
-  - "Who Should NOT Buy" → "Best Suited For"
-  - Removed Authenticity Score feature
-  - Updated AI prompt for neutral language
-  - Added required disclaimers
+
+### Phase 1: Core MVP (Dec 2024)
+- [x] Stunning dark-themed landing page with animations
+- [x] Google OAuth via Emergent Auth
+- [x] Email/Password authentication with JWT
+- [x] Forgot password with email reset (Resend-ready)
+- [x] Amazon product scraping with BeautifulSoup
+- [x] AI-powered analysis using OpenAI GPT-4o-mini
+- [x] Results page with score gauge, feedback insights, verdict
+- [x] Pricing page with Stripe integration
+- [x] Account page with subscription status
+- [x] Usage limits and subscription enforcement
+
+### Phase 2: Features (Dec 2024 - Jan 2025)
+- [x] Multi-tier pricing UI (Shoppers + Business plans)
+- [x] History Page with stats, search, filters
+- [x] CSV Export API for Premium/Business users
+- [x] Session persistence fix
+- [x] Wishlist feature
+- [x] Product Comparison tool
+- [x] Public Insight Pages with SEO
+
+### Phase 3: Admin & Safety (Jan 2025)
+- [x] Admin Dashboard with AI controls
+- [x] Safe Core Refactoring (verdicts, terminology)
+- [x] Pre-launch checklist completion
 
 ## Tech Stack
 - **Frontend**: React + Tailwind CSS + Shadcn/UI (Dark Theme)
@@ -66,6 +91,7 @@ Build Veriqo - a smart Amazon shopping assistant with stunning landing page, Goo
 - **Auth**: JWT + Emergent Google OAuth
 - **Scraping**: BeautifulSoup + httpx
 - **Email**: Resend (ready for production)
+- **Analytics**: Google Analytics 4
 
 ## Required API Keys
 - `EMERGENT_LLM_KEY` - For GPT analysis ✅ Configured
@@ -73,11 +99,10 @@ Build Veriqo - a smart Amazon shopping assistant with stunning landing page, Goo
 - `RESEND_API_KEY` - For password reset emails (needs user key)
 
 ## Test Results (Jan 7, 2025)
-- Backend: 100% passing (10/10 tests)
+- Backend: 100% passing
 - Frontend: 100% passing
+- Pre-launch checklist: ✅ Complete
 - Safe Core Implementation: ✅ Complete
-- All verdict terminology updated
-- Backward compatibility maintained for old data
 
 ## Prioritized Backlog
 
@@ -90,14 +115,13 @@ Build Veriqo - a smart Amazon shopping assistant with stunning landing page, Goo
 - [x] History Page
 - [x] CSV Export
 - [x] Safe Core Refactoring
+- [x] Pre-launch checklist
 
 ### P1 (Important - Next)
 - [ ] Add Resend API key for production emails
 - [ ] Implement Price Drop Alerts
-- [ ] Populate Privacy Policy page content
-- [ ] Populate Terms of Service page content
-- [ ] Implement Stripe Price IDs for business plans
 - [ ] Chrome Browser Extension (backend prep)
+- [ ] Implement Stripe Price IDs for business plans
 
 ### P2 (Nice to Have)
 - [ ] Team management for business plans
@@ -111,14 +135,22 @@ Build Veriqo - a smart Amazon shopping assistant with stunning landing page, Goo
 - `/app/backend/server.py` - Main FastAPI backend with Safe Core prompt
 - `/app/frontend/src/pages/ResultsPage.js` - Shows Things to Know, Best Suited For
 - `/app/frontend/src/pages/HistoryPage.js` - Safe Core verdict display
-- `/app/frontend/src/pages/LandingPage.js` - Safe Core marketing copy
-- `/app/frontend/src/components/ScoreGauge.js` - Verdict badge rendering
+- `/app/frontend/src/pages/LandingPage.js` - Safe Core marketing copy + footer
+- `/app/frontend/src/pages/PrivacyPage.js` - Privacy Policy
+- `/app/frontend/src/pages/TermsPage.js` - Terms of Service
+- `/app/frontend/src/pages/DisclaimerPage.js` - Disclaimer
+- `/app/frontend/src/pages/TrustPage.js` - Trust & Transparency
+- `/app/frontend/src/pages/ContactPage.js` - Contact (support@veriqo.com)
+- `/app/frontend/src/pages/FAQPage.js` - FAQ with categories
+- `/app/frontend/public/sitemap.xml` - SEO sitemap
+- `/app/frontend/public/robots.txt` - Search engine directives
+- `/app/frontend/public/index.html` - Google Analytics (G-518729566)
 
 ## Key API Endpoints
-- `GET /api/history` - Get user's analysis history (up to 100 items)
-- `GET /api/history/export` - Export history as CSV (Premium+ only)
+- `GET /api/history` - Get user's analysis history
+- `GET /api/history/export` - Export history as CSV
 - `POST /api/analyze` - Analyze Amazon product
 - `GET /api/wishlist` - Get saved products
 - `POST /api/compare` - Compare 2-3 products
-- `GET /api/admin/stats` - Admin dashboard stats (Safe Core naming)
+- `GET /api/admin/stats` - Admin dashboard stats
 - `GET /api/admin/ai-config` - AI safety controls
