@@ -325,18 +325,35 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {analyses.slice(0, 20).map((a) => (
+                {analyses.slice(0, 20).map((a) => {
+                  // Safe Core: normalize verdict
+                  const normalizeVerdict = (v) => {
+                    const map = {
+                      'buy': 'great_match', 'BUY': 'great_match', 'great_match': 'great_match',
+                      'think': 'good_match', 'THINK': 'good_match', 'good_match': 'good_match',
+                      'avoid': 'consider_options', 'AVOID': 'consider_options', 'consider_options': 'consider_options'
+                    };
+                    return map[v] || 'good_match';
+                  };
+                  const getVerdictLabel = (v) => {
+                    const normalized = normalizeVerdict(v);
+                    const labels = { 'great_match': 'Great Match', 'good_match': 'Good Match', 'consider_options': 'Consider' };
+                    return labels[normalized] || 'Good Match';
+                  };
+                  const normalized = normalizeVerdict(a.verdict);
+                  
+                  return (
                   <tr key={a.id} className="border-t border-white/5 hover:bg-white/5">
                     <td className="p-4">
                       <p className="text-white font-medium truncate max-w-xs">{a.product_name}</p>
                     </td>
                     <td className="p-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        a.verdict === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' :
-                        a.verdict === 'THINK' ? 'bg-amber-500/20 text-amber-400' :
-                        'bg-red-500/20 text-red-400'
+                        normalized === 'great_match' ? 'bg-emerald-500/20 text-emerald-400' :
+                        normalized === 'good_match' ? 'bg-amber-500/20 text-amber-400' :
+                        'bg-indigo-500/20 text-indigo-400'
                       }`}>
-                        {a.verdict}
+                        {getVerdictLabel(a.verdict)}
                       </span>
                     </td>
                     <td className="p-4 text-white">{a.confidence_score}%</td>
@@ -345,7 +362,8 @@ export default function AdminPage() {
                       {new Date(a.analyzed_at).toLocaleDateString()}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
