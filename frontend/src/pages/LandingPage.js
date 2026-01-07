@@ -137,7 +137,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div className="mt-4 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full">
-                    <span className="text-emerald-400 font-bold uppercase tracking-wider">BUY</span>
+                    <span className="text-emerald-400 font-bold uppercase tracking-wider">GREAT MATCH</span>
                   </div>
                 </div>
                 <div className="flex-1">
