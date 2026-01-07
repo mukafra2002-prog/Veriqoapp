@@ -70,19 +70,19 @@ export default function LandingPage() {
             </span>
           </h1>
           
-          {/* Subheadline */}
+          {/* Subheadline - Safe Core */}
           <p className="text-xl sm:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed animate-slide-up stagger-1">
-            AI-powered Amazon review analysis. Get instant
+            AI-powered Amazon product insights. Get instant
             <span className="inline-flex items-center mx-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-lg font-semibold">
-              <CheckCircle className="w-4 h-4 mr-1.5" /> Buy
+              <CheckCircle className="w-4 h-4 mr-1.5" /> Great Match
             </span>
             <span className="inline-flex items-center mx-2 px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full text-lg font-semibold">
-              <AlertTriangle className="w-4 h-4 mr-1.5" /> Think
+              <AlertTriangle className="w-4 h-4 mr-1.5" /> Good Match
             </span>
-            <span className="inline-flex items-center mx-2 px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-lg font-semibold">
-              <Shield className="w-4 h-4 mr-1.5" /> Avoid
+            <span className="inline-flex items-center mx-2 px-3 py-1 bg-indigo-500/10 text-indigo-400 rounded-full text-lg font-semibold">
+              <Shield className="w-4 h-4 mr-1.5" /> Consider Options
             </span>
-            verdicts.
+            insights.
           </p>
 
           {/* CTA Buttons */}
