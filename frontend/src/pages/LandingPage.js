@@ -333,7 +333,7 @@ export default function LandingPage() {
                 price: '0',
                 period: '/month',
                 description: 'Perfect for casual shoppers',
-                features: ['3 product checks per month', 'Buy/Think/Avoid verdict', 'Top complaints view', 'Basic support'],
+                features: ['3 product checks per month', 'Product match insights', 'Things to know view', 'Basic support'],
                 popular: false,
                 cta: 'Get Started'
               },
