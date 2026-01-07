@@ -56,6 +56,31 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+// Admin Route Component - only for admin users
+const AdminRoute = ({ children }) => {
+  const { user, loading, token } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+  
+  // If not authenticated, redirect to login
+  if (!token || !user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  // If not admin, redirect to home
+  if (!user.is_admin) {
+    return <Navigate to="/home" replace />;
+  }
+  
+  return children;
+};
+
 // Public Route (redirect if logged in)
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
