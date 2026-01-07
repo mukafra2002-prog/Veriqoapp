@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
-import { Zap, ArrowLeft } from 'lucide-react';
-import { Button } from '../components/ui/button';
+import { Zap, FileText, Scale, AlertCircle, UserCheck, Ban, CreditCard, Shield } from 'lucide-react';
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Header */}
-      <nav className="border-b border-white/5 sticky top-0 bg-slate-950/90 backdrop-blur-xl z-50">
+      <header className="border-b border-white/5 bg-slate-900/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
@@ -14,190 +13,174 @@ export default function TermsPage() {
             </div>
             <span className="font-bold text-white">Veriqo</span>
           </Link>
-          <Link to="/">
-            <Button variant="ghost" className="text-slate-400 hover:text-white">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-          </Link>
         </div>
-      </nav>
+      </header>
 
-      {/* Content */}
       <main className="max-w-4xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-white mb-2">Terms of Service</h1>
-        <p className="text-slate-400 mb-8">Last updated: January 2025</p>
+        <div className="mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-400 text-sm mb-4">
+            <FileText className="w-4 h-4" />
+            Legal
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-4">Terms of Service</h1>
+          <p className="text-slate-400">Last updated: January 2025</p>
+        </div>
 
         <div className="prose prose-invert max-w-none space-y-8">
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">1. Agreement to Terms</h2>
+          {/* Introduction */}
+          <section className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Scale className="w-5 h-5 text-purple-400" />
+              Agreement to Terms
+            </h2>
             <p className="text-slate-300 leading-relaxed">
-              By accessing or using Veriqo ("Service"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you may not access the Service.
+              By accessing or using Veriqo ("Service"), you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, you may not access the Service. These terms apply to all visitors, users, and others who access or use the Service.
             </p>
           </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">2. Description of Service</h2>
-            <p className="text-slate-300 mb-4">
-              Veriqo provides AI-powered analysis of Amazon product reviews to help users make informed purchasing decisions. Our service includes:
-            </p>
-            <ul className="list-disc list-inside text-slate-300 space-y-2">
-              <li>Product analysis with Buy/Think/Avoid verdicts</li>
-              <li>Aggregated feedback summaries</li>
-              <li>Product comparison tools</li>
-              <li>Analysis history and wishlist features</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">3. Important Disclaimers</h2>
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 space-y-4">
-              <div>
-                <h3 className="text-lg font-medium text-red-400 mb-2">3.1 Not Professional Advice</h3>
-                <p className="text-slate-300">
-                  Veriqo's analysis is for informational purposes only and does not constitute professional, financial, or purchasing advice. Always conduct your own research before making purchase decisions.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-red-400 mb-2">3.2 AI Limitations</h3>
-                <p className="text-slate-300">
-                  Our AI summarizes aggregated customer feedback patterns. Results may not be 100% accurate, complete, or up-to-date. Individual experiences with products may vary significantly.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-red-400 mb-2">3.3 No Review Authenticity Claims</h3>
-                <p className="text-slate-300">
-                  Veriqo does not make claims about the authenticity of Amazon reviews. We do not accuse sellers, manufacturers, or other parties of fraudulent practices.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-red-400 mb-2">3.4 Not Affiliated with Amazon</h3>
-                <p className="text-slate-300">
-                  Veriqo is an independent service and is not affiliated with, endorsed by, or sponsored by Amazon.com, Inc. or its affiliates.
+          {/* Service Description */}
+          <section className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Shield className="w-5 h-5 text-blue-400" />
+              Service Description
+            </h2>
+            <div className="space-y-4 text-slate-300">
+              <p>Veriqo provides AI-powered product insight summaries based on publicly available customer feedback from Amazon. Our service:</p>
+              <ul className="list-disc list-inside space-y-2">
+                <li>Summarizes aggregated customer feedback patterns</li>
+                <li>Provides informational insights to help you understand products</li>
+                <li>Offers "Great Match," "Good Match," or "Consider Options" assessments</li>
+                <li>Highlights key feedback patterns and user fit recommendations</li>
+              </ul>
+              <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                <p className="text-amber-300 text-sm">
+                  <strong>Important:</strong> Veriqo is an informational tool only. We do not verify reviews, guarantee product quality, or make claims about seller authenticity. All insights are for informational purposes to support your personal purchasing decisions.
                 </p>
               </div>
             </div>
           </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">4. User Accounts</h2>
-            <ul className="list-disc list-inside text-slate-300 space-y-2">
-              <li>You must provide accurate information when creating an account</li>
-              <li>You are responsible for maintaining the security of your account</li>
-              <li>You must be at least 18 years old to use the Service</li>
-              <li>One person may not maintain multiple free accounts</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">5. Subscription Plans</h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-medium text-white mb-2">5.1 Free Plan</h3>
-                <p className="text-slate-300">
-                  Free users receive 3 product analyses per month. Unused analyses do not roll over.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-white mb-2">5.2 Premium Plan</h3>
-                <p className="text-slate-300">
-                  Premium subscribers receive unlimited analyses, CSV export, and priority support. Subscription fees are billed monthly or annually.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-white mb-2">5.3 Cancellation</h3>
-                <p className="text-slate-300">
-                  You may cancel your subscription at any time. Access continues until the end of your billing period. No refunds for partial months.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">6. Acceptable Use</h2>
-            <p className="text-slate-300 mb-4">You agree NOT to:</p>
-            <ul className="list-disc list-inside text-slate-300 space-y-2">
-              <li>Use the Service for any illegal purpose</li>
-              <li>Attempt to reverse-engineer or copy our AI analysis methods</li>
-              <li>Scrape, crawl, or automatically access the Service</li>
-              <li>Share your account credentials with others</li>
-              <li>Circumvent usage limits or security measures</li>
-              <li>Use the Service to defame products, sellers, or manufacturers</li>
-              <li>Republish our analysis as your own content without attribution</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">7. Intellectual Property</h2>
-            <p className="text-slate-300">
-              The Service, including its AI algorithms, design, and content, is owned by Veriqo and protected by intellectual property laws. You may not copy, modify, or distribute our content without permission.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">8. Amazon Affiliate Program</h2>
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-6">
-              <p className="text-amber-200">
-                Veriqo participates in the Amazon Services LLC Associates Program. When you click our "Buy on Amazon" links and make a purchase, we may earn a commission at no additional cost to you. This affiliate relationship does not influence our analysis results.
+          {/* User Accounts */}
+          <section className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <UserCheck className="w-5 h-5 text-emerald-400" />
+              User Accounts
+            </h2>
+            <div className="space-y-4 text-slate-300">
+              <p>When you create an account with us, you must:</p>
+              <ul className="list-disc list-inside space-y-2">
+                <li>Provide accurate and complete information</li>
+                <li>Maintain the security of your account credentials</li>
+                <li>Notify us immediately of any unauthorized access</li>
+                <li>Accept responsibility for all activities under your account</li>
+              </ul>
+              <p className="mt-4">
+                You must be at least 18 years old to use this Service. By using the Service, you represent that you meet this requirement.
               </p>
             </div>
           </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">9. Limitation of Liability</h2>
-            <div className="bg-slate-800/50 border border-white/10 rounded-xl p-6">
-              <p className="text-slate-300">
-                TO THE MAXIMUM EXTENT PERMITTED BY LAW, VERIQO SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING LOSS OF PROFITS, DATA, OR GOODWILL, ARISING FROM YOUR USE OF THE SERVICE OR RELIANCE ON OUR ANALYSIS RESULTS.
+          {/* Subscriptions & Payments */}
+          <section className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-pink-400" />
+              Subscriptions & Payments
+            </h2>
+            <div className="space-y-4 text-slate-300">
+              <div>
+                <h3 className="font-semibold text-white mb-2">Free Tier</h3>
+                <p>Free accounts receive 3 product analyses per month with basic features.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-white mb-2">Premium Subscriptions</h3>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Premium plans are billed monthly or annually</li>
+                  <li>Payments are processed securely via Stripe</li>
+                  <li>Subscriptions auto-renew unless cancelled</li>
+                  <li>You may cancel at any time from your account settings</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold text-white mb-2">Refunds</h3>
+                <p>We offer a 7-day refund policy for first-time subscribers. Contact support@veriqo.com for refund requests.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Prohibited Uses */}
+          <section className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Ban className="w-5 h-5 text-red-400" />
+              Prohibited Uses
+            </h2>
+            <p className="text-slate-300 mb-4">You agree NOT to use the Service to:</p>
+            <ul className="list-disc list-inside space-y-2 text-slate-300">
+              <li>Violate any applicable laws or regulations</li>
+              <li>Scrape, copy, or redistribute our content without permission</li>
+              <li>Attempt to reverse-engineer our AI or algorithms</li>
+              <li>Use automated tools to access the Service excessively</li>
+              <li>Impersonate others or misrepresent your affiliation</li>
+              <li>Upload malicious code or interfere with Service operation</li>
+              <li>Use insights to make defamatory claims about products or sellers</li>
+            </ul>
+          </section>
+
+          {/* Intellectual Property */}
+          <section className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Intellectual Property</h2>
+            <p className="text-slate-300">
+              The Service and its original content (excluding user-provided data), features, and functionality are owned by Veriqo and are protected by copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.
+            </p>
+          </section>
+
+          {/* Limitation of Liability */}
+          <section className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-amber-400" />
+              Limitation of Liability
+            </h2>
+            <div className="space-y-4 text-slate-300">
+              <p>
+                TO THE MAXIMUM EXTENT PERMITTED BY LAW, VERIQO SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO:
+              </p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Loss of profits, data, or business opportunities</li>
+                <li>Purchasing decisions made based on our insights</li>
+                <li>Product quality or seller behavior</li>
+                <li>Accuracy of third-party information</li>
+              </ul>
+              <p className="mt-4 text-sm text-slate-400">
+                Our total liability shall not exceed the amount you paid us in the 12 months preceding the claim.
               </p>
             </div>
           </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">10. Indemnification</h2>
+          {/* Termination */}
+          <section className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Termination</h2>
             <p className="text-slate-300">
-              You agree to indemnify and hold harmless Veriqo, its officers, directors, employees, and agents from any claims, damages, or expenses arising from your use of the Service or violation of these Terms.
+              We may terminate or suspend your account immediately, without prior notice, for any reason, including breach of these Terms. Upon termination, your right to use the Service will cease immediately. You may also delete your account at any time through your account settings.
             </p>
           </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">11. Service Availability</h2>
+          {/* Changes to Terms */}
+          <section className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Changes to Terms</h2>
             <p className="text-slate-300">
-              We strive to maintain 99.9% uptime but do not guarantee uninterrupted access. We may suspend the Service for maintenance, updates, or security reasons. The AI analysis feature may be temporarily disabled for maintenance.
+              We reserve the right to modify these terms at any time. We will notify users of material changes via email or prominent notice on our Service. Continued use after changes constitutes acceptance of the new terms.
             </p>
           </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">12. Modifications to Service</h2>
+          {/* Contact */}
+          <section className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Contact Us</h2>
             <p className="text-slate-300">
-              We reserve the right to modify, suspend, or discontinue the Service at any time. We will provide reasonable notice for significant changes. Continued use after changes constitutes acceptance.
+              For questions about these Terms of Service, please contact us at:
             </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">13. Governing Law</h2>
-            <p className="text-slate-300">
-              These Terms shall be governed by and construed in accordance with the laws of the United States, without regard to its conflict of law provisions.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">14. Dispute Resolution</h2>
-            <p className="text-slate-300">
-              Any disputes arising from these Terms or your use of the Service shall be resolved through binding arbitration, except where prohibited by law. You waive any right to participate in class action lawsuits.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">15. Contact Information</h2>
-            <p className="text-slate-300">
-              For questions about these Terms, please contact us at legal@veriqo.com.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">16. Severability</h2>
-            <p className="text-slate-300">
-              If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.
+            <p className="mt-2">
+              <a href="mailto:support@veriqo.com" className="text-blue-400 hover:underline font-semibold">
+                support@veriqo.com
+              </a>
             </p>
           </section>
         </div>
@@ -205,16 +188,13 @@ export default function TermsPage() {
 
       {/* Footer */}
       <footer className="border-t border-white/5 py-8 mt-12">
-        <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-semibold text-white">Veriqo</span>
-          </Link>
-          <div className="flex items-center gap-6">
-            <Link to="/privacy" className="text-slate-400 hover:text-white text-sm">Privacy Policy</Link>
-            <Link to="/terms" className="text-slate-400 hover:text-white text-sm">Terms of Service</Link>
+        <div className="max-w-4xl mx-auto px-4 text-center text-slate-500 text-sm">
+          <p>© 2025 Veriqo. All rights reserved.</p>
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <Link to="/privacy" className="hover:text-white">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-white">Terms of Service</Link>
+            <Link to="/disclaimer" className="hover:text-white">Disclaimer</Link>
+            <Link to="/contact" className="hover:text-white">Contact</Link>
           </div>
         </div>
       </footer>
