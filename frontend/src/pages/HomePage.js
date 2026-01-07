@@ -81,10 +81,32 @@ export default function HomePage() {
     }
   };
 
+  // Safe Core: Helper to normalize verdict from old/new formats
+  const normalizeVerdict = (v) => {
+    const map = {
+      'buy': 'great_match', 'BUY': 'great_match', 'great_match': 'great_match',
+      'think': 'good_match', 'THINK': 'good_match', 'good_match': 'good_match',
+      'avoid': 'consider_options', 'AVOID': 'consider_options', 'consider_options': 'consider_options'
+    };
+    return map[v] || 'good_match';
+  };
+
+  // Safe Core: Get display label for verdict
+  const getVerdictLabel = (verdict) => {
+    const normalized = normalizeVerdict(verdict);
+    const labels = {
+      'great_match': 'Great Match',
+      'good_match': 'Good Match',
+      'consider_options': 'Consider'
+    };
+    return labels[normalized] || 'Good Match';
+  };
+
   const getVerdictColor = (verdict) => {
-    if (verdict === 'buy') return 'text-emerald-400 bg-emerald-500/20 border-emerald-500/30';
-    if (verdict === 'think') return 'text-amber-400 bg-amber-500/20 border-amber-500/30';
-    return 'text-red-400 bg-red-500/20 border-red-500/30';
+    const normalized = normalizeVerdict(verdict);
+    if (normalized === 'great_match') return 'text-emerald-400 bg-emerald-500/20 border-emerald-500/30';
+    if (normalized === 'good_match') return 'text-amber-400 bg-amber-500/20 border-amber-500/30';
+    return 'text-indigo-400 bg-indigo-500/20 border-indigo-500/30'; // Purple for consider_options (neutral)
   };
 
   return (
