@@ -289,14 +289,14 @@ export default function LandingPage() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                <div className="mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
                   <div className="flex items-center gap-2 mb-2">
-                    <Users className="w-5 h-5 text-amber-400" />
-                    <span className="text-amber-400 font-semibold">Who Should NOT Buy</span>
+                    <Users className="w-5 h-5 text-emerald-400" />
+                    <span className="text-emerald-400 font-semibold">Best Suited For</span>
                   </div>
                   <ul className="text-slate-400 text-sm space-y-1">
-                    <li>• Heavy daily users expecting 3+ year lifespan</li>
-                    <li>• Users without patience for support tickets</li>
+                    <li>• Budget-conscious shoppers</li>
+                    <li>• Users with flexible expectations</li>
                   </ul>
                 </div>
               </div>
