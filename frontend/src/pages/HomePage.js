@@ -216,7 +216,7 @@ export default function HomePage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${getVerdictColor(item.verdict)}`}>
-                        {item.verdict}
+                        {getVerdictLabel(item.verdict)}
                       </span>
                       <span className="text-2xl font-bold text-white">
                         {item.confidence_score}
