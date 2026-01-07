@@ -825,15 +825,15 @@ Provide a NEUTRAL summary of feedback patterns with a verdict. Remember to use h
         result = {
             "product_name": scraped_data.get("product_name", "Amazon Product") if scraped_data else "Amazon Product",
             "product_image": scraped_data.get("product_image") if scraped_data else None,
-            "verdict": "think",
+            "verdict": "good_match",
             "confidence_score": 65,
-            "top_complaints": [
-                {"title": "Mixed Feedback", "description": "Some customers reported quality variations", "frequency": "~15% of feedback"},
-                {"title": "Delivery Experience", "description": "Occasional shipping delays noted", "frequency": "~8% of feedback"},
-                {"title": "Size/Fit Variations", "description": "Some feedback mentions sizing differences", "frequency": "~5% of feedback"}
+            "things_to_know": [
+                {"title": "Mixed Feedback Patterns", "description": "Some customers reported quality variations in their experience", "frequency": "~15% of feedback"},
+                {"title": "Delivery Experience", "description": "Occasional shipping timeline variations noted", "frequency": "~8% of feedback"},
+                {"title": "Size/Fit Variations", "description": "Some feedback mentions sizing may differ from expectations", "frequency": "~5% of feedback"}
             ],
-            "who_should_not_buy": ["Those seeking premium-tier quality", "Users with urgent delivery needs"],
-            "summary": "This product shows mixed feedback patterns. Some customers report satisfaction while others note areas for improvement.",
+            "best_suited_for": ["Budget-conscious shoppers", "Users with flexible expectations", "First-time buyers in this category"],
+            "summary": "This product shows mixed feedback patterns. Some customers report satisfaction while others note areas where expectations differed from experience.",
             "positive_highlights": ["Reasonable value for price point", "Generally meets basic expectations"],
             "disclaimer": REQUIRED_DISCLAIMERS["analysis"]
         }
