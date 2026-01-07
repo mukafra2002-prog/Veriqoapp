@@ -138,7 +138,7 @@ function AppRouter() {
       <Route path="/history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
       <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
       <Route path="/compare" element={<ProtectedRoute><ComparePage /></ProtectedRoute>} />
-      <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+      <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
       <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccessPage /></ProtectedRoute>} />
       
       {/* Catch all */}
