@@ -597,7 +597,7 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Verdict Distribution */}
+            {/* Verdict Distribution - Safe Core naming */}
             <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-purple-400" />
@@ -605,11 +605,13 @@ export default function AdminPage() {
               </h3>
               <div className="space-y-4">
                 {[
-                  { label: 'BUY', count: stats?.verdict_buy || 0, color: 'bg-emerald-500' },
-                  { label: 'THINK', count: stats?.verdict_think || 0, color: 'bg-amber-500' },
-                  { label: 'AVOID', count: stats?.verdict_avoid || 0, color: 'bg-red-500' }
+                  { label: 'Great Match', count: stats?.verdict_great_match || stats?.verdict_buy || 0, color: 'bg-emerald-500' },
+                  { label: 'Good Match', count: stats?.verdict_good_match || stats?.verdict_think || 0, color: 'bg-amber-500' },
+                  { label: 'Consider Options', count: stats?.verdict_consider_options || stats?.verdict_avoid || 0, color: 'bg-indigo-500' }
                 ].map((item) => {
-                  const total = (stats?.verdict_buy || 0) + (stats?.verdict_think || 0) + (stats?.verdict_avoid || 0);
+                  const total = (stats?.verdict_great_match || stats?.verdict_buy || 0) + 
+                               (stats?.verdict_good_match || stats?.verdict_think || 0) + 
+                               (stats?.verdict_consider_options || stats?.verdict_avoid || 0);
                   const percentage = total > 0 ? (item.count / total) * 100 : 0;
                   return (
                     <div key={item.label}>
