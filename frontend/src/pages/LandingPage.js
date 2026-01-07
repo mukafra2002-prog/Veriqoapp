@@ -471,20 +471,48 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="relative py-12 px-4 border-t border-white/5">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-semibold text-white">Veriqo</span>
+        <div className="max-w-6xl mx-auto">
+          {/* Affiliate Disclosure */}
+          <div className="mb-8 p-4 bg-slate-800/30 border border-white/5 rounded-xl text-center">
+            <p className="text-slate-500 text-xs">
+              <strong className="text-slate-400">Affiliate Disclosure:</strong> As an Amazon Associate, Veriqo earns from qualifying purchases. 
+              This helps support our service at no additional cost to you.
+            </p>
           </div>
-          <p className="text-slate-500 text-sm">
-            © 2024 Veriqo. Verify before you buy.
-          </p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-slate-500 hover:text-white transition-colors text-sm">Privacy</a>
-            <a href="#" className="text-slate-500 hover:text-white transition-colors text-sm">Terms</a>
-            <a href="mailto:support@veriqoapp.com" className="text-slate-500 hover:text-white transition-colors text-sm">Contact</a>
+          
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-semibold text-white">Veriqo</span>
+            </div>
+            
+            {/* Links */}
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <Link to="/shoppers" className="text-slate-500 hover:text-white transition-colors text-sm">For Shoppers</Link>
+              <Link to="/sellers" className="text-slate-500 hover:text-white transition-colors text-sm">For Sellers</Link>
+              <Link to="/faq" className="text-slate-500 hover:text-white transition-colors text-sm">FAQ</Link>
+              <Link to="/trust" className="text-slate-500 hover:text-white transition-colors text-sm">Trust</Link>
+              <Link to="/contact" className="text-slate-500 hover:text-white transition-colors text-sm">Contact</Link>
+            </div>
+            
+            {/* Legal Links */}
+            <div className="flex items-center gap-4">
+              <Link to="/privacy" className="text-slate-500 hover:text-white transition-colors text-sm">Privacy</Link>
+              <Link to="/terms" className="text-slate-500 hover:text-white transition-colors text-sm">Terms</Link>
+              <Link to="/disclaimer" className="text-slate-500 hover:text-white transition-colors text-sm">Disclaimer</Link>
+            </div>
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-white/5 text-center">
+            <p className="text-slate-500 text-sm">
+              © 2025 Veriqo. Smart shopping insights powered by AI.
+            </p>
+            <p className="text-slate-600 text-xs mt-2">
+              Veriqo provides informational summaries based on aggregated customer feedback. Not affiliated with Amazon.
+            </p>
           </div>
         </div>
       </footer>
