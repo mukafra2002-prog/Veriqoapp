@@ -3,15 +3,25 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '../components/ui/button';
 import { 
-  Zap, CheckCircle, AlertTriangle, XCircle, Shield,
+  Zap, CheckCircle, Info, Lightbulb, Shield,
   ShoppingCart, Star, Users, Clock, ExternalLink,
   ThumbsUp, ThumbsDown, ArrowRight, Share2, Loader2,
-  Target, UserCheck, UserX, TrendingUp, BarChart3,
+  Target, UserCheck, TrendingUp, BarChart3,
   Lock, Sparkles, Eye, Award
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+
+// Safe Core: Helper to normalize verdict from old/new formats
+const normalizeVerdict = (v) => {
+  const map = {
+    'buy': 'great_match', 'BUY': 'great_match', 'great_match': 'great_match',
+    'think': 'good_match', 'THINK': 'good_match', 'good_match': 'good_match',
+    'avoid': 'consider_options', 'AVOID': 'consider_options', 'consider_options': 'consider_options'
+  };
+  return map[v] || 'good_match';
+};
 
 export default function PublicInsightPage() {
   const { productId } = useParams();
@@ -35,33 +45,34 @@ export default function PublicInsightPage() {
   };
 
   const getVerdictConfig = (verdict) => {
-    switch (verdict?.toUpperCase()) {
-      case 'BUY':
+    const normalized = normalizeVerdict(verdict);
+    switch (normalized) {
+      case 'great_match':
         return {
           icon: CheckCircle,
           color: 'text-emerald-400',
           bgColor: 'bg-emerald-500/10',
           borderColor: 'border-emerald-500/30',
-          label: 'Recommended',
-          description: 'This product receives positive feedback from most buyers.'
+          label: 'Great Match',
+          description: 'Based on feedback patterns, this product appears to meet expectations for most users.'
         };
-      case 'THINK':
+      case 'good_match':
         return {
-          icon: AlertTriangle,
+          icon: Info,
           color: 'text-amber-400',
           bgColor: 'bg-amber-500/10',
           borderColor: 'border-amber-500/30',
-          label: 'Consider Carefully',
-          description: 'This product has mixed reviews. Consider if it fits your needs.'
+          label: 'Good Match',
+          description: 'This product has mixed feedback. Review the insights to see if it fits your needs.'
         };
-      case 'AVOID':
+      case 'consider_options':
         return {
-          icon: XCircle,
-          color: 'text-red-400',
-          bgColor: 'bg-red-500/10',
-          borderColor: 'border-red-500/30',
-          label: 'Not Recommended',
-          description: 'This product has significant issues reported by customers.'
+          icon: Lightbulb,
+          color: 'text-indigo-400',
+          bgColor: 'bg-indigo-500/10',
+          borderColor: 'border-indigo-500/30',
+          label: 'Consider Options',
+          description: 'Review the feedback patterns carefully to determine if this suits your requirements.'
         };
       default:
         return {
@@ -80,7 +91,7 @@ export default function PublicInsightPage() {
       try {
         await navigator.share({
           title: `${insight?.product_name} - Product Insight | Veriqo`,
-          text: `Is "${insight?.product_name}" worth it? Check out this AI-powered analysis.`,
+          text: `Check out this AI-powered product insight for "${insight?.product_name}".`,
           url: window.location.href
         });
       } catch (err) {
@@ -92,7 +103,7 @@ export default function PublicInsightPage() {
     }
   };
 
-  // Generate ideal buyers based on verdict and complaints
+  // Safe Core: Generate ideal buyers based on verdict and score
   const getIdealBuyers = () => {
     const score = insight?.confidence_score || 50;
     if (score >= 70) {
@@ -105,21 +116,20 @@ export default function PublicInsightPage() {
       return [
         "Users with flexible expectations",
         "Those who can verify compatibility before purchase",
-        "Shoppers comfortable with potential exchanges"
+        "Shoppers comfortable with standard delivery times"
       ];
     }
     return [
-      "Only if no alternatives are available",
-      "Users who can thoroughly verify specs first",
-      "Those with easy return access"
+      "Users who can thoroughly research specs first",
+      "Those with flexible requirements",
+      "Shoppers with easy return access"
     ];
   };
 
   // Calculate expectation score
   const getExpectationScore = () => {
     const confidence = insight?.confidence_score || 50;
-    const authenticity = insight?.authenticity_score || 70;
-    return Math.round((confidence * 0.6) + (authenticity * 0.4));
+    return Math.round(confidence * 0.9); // Simplified calculation
   };
 
   if (loading) {
@@ -162,12 +172,16 @@ export default function PublicInsightPage() {
   const expectationScore = getExpectationScore();
   const idealBuyers = getIdealBuyers();
 
+  // Safe Core: Get data with fallbacks for both old and new field names
+  const thingsToKnow = insight?.things_to_know || insight?.top_complaints || [];
+  const bestSuitedFor = insight?.best_suited_for || insight?.who_should_not_buy || [];
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* SEO Meta Tags */}
       <Helmet>
-        <title>{insight?.product_name} - Is It Worth It? | Veriqo Product Insight</title>
-        <meta name="description" content={`${insight?.summary?.slice(0, 155)}... Read the full AI-powered analysis of ${insight?.product_name} on Veriqo.`} />
+        <title>{insight?.product_name} - Product Insight | Veriqo</title>
+        <meta name="description" content={`${insight?.summary?.slice(0, 155)}... Read the full AI-powered insight for ${insight?.product_name} on Veriqo.`} />
         <meta property="og:title" content={`${insight?.product_name} - Product Insight | Veriqo`} />
         <meta property="og:description" content={insight?.summary?.slice(0, 200)} />
         <meta property="og:type" content="article" />
@@ -242,7 +256,7 @@ export default function PublicInsightPage() {
 
               <p className="text-slate-400 mb-6">{verdictConfig.description}</p>
 
-              {/* Buy Button */}
+              {/* View on Amazon Button */}
               <a 
                 href={insight?.affiliate_url || insight?.amazon_url} 
                 target="_blank" 
@@ -280,7 +294,7 @@ export default function PublicInsightPage() {
                     <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-slate-700" strokeWidth="8"/>
                     <circle 
                       cx="50" cy="50" r="42" fill="none" 
-                      stroke={expectationScore >= 70 ? '#10B981' : expectationScore >= 40 ? '#F59E0B' : '#EF4444'} 
+                      stroke={expectationScore >= 70 ? '#10B981' : expectationScore >= 40 ? '#F59E0B' : '#6366F1'} 
                       strokeWidth="8" strokeLinecap="round" 
                       strokeDasharray="264" 
                       strokeDashoffset={264 - (264 * expectationScore / 100)}
@@ -294,11 +308,11 @@ export default function PublicInsightPage() {
                 <div className="flex-1">
                   <p className="text-slate-300 text-sm mb-2">
                     {expectationScore >= 70 ? 'High likelihood of meeting expectations' : 
-                     expectationScore >= 40 ? 'Mixed results - verify before buying' : 
-                     'Often falls short of expectations'}
+                     expectationScore >= 40 ? 'Mixed results - review details before buying' : 
+                     'Consider reviewing feedback patterns carefully'}
                   </p>
                   <p className="text-slate-500 text-xs">
-                    Based on review sentiment and authenticity analysis
+                    Based on aggregated customer feedback analysis
                   </p>
                 </div>
               </div>
@@ -316,7 +330,7 @@ export default function PublicInsightPage() {
                     <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-slate-700" strokeWidth="8"/>
                     <circle 
                       cx="50" cy="50" r="42" fill="none" 
-                      stroke={insight?.confidence_score >= 70 ? '#10B981' : insight?.confidence_score >= 40 ? '#F59E0B' : '#EF4444'} 
+                      stroke={insight?.confidence_score >= 70 ? '#10B981' : insight?.confidence_score >= 40 ? '#F59E0B' : '#6366F1'} 
                       strokeWidth="8" strokeLinecap="round" 
                       strokeDasharray="264" 
                       strokeDashoffset={264 - (264 * (insight?.confidence_score || 0) / 100)}
@@ -329,30 +343,30 @@ export default function PublicInsightPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-slate-300 text-sm mb-2">
-                    AI-calculated purchase recommendation score
+                    AI-calculated insight confidence score
                   </p>
                   <p className="text-slate-500 text-xs">
-                    Based on verified customer reviews
+                    Based on customer feedback patterns
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Key Concerns */}
+            {/* Things to Know (Safe Core naming) */}
             <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-4">
-                <AlertTriangle className="w-5 h-5 text-red-400" />
-                <h3 className="text-lg font-semibold text-white">Key Concerns</h3>
+                <Lightbulb className="w-5 h-5 text-amber-400" />
+                <h3 className="text-lg font-semibold text-white">Things to Know</h3>
               </div>
               <div className="space-y-3">
-                {insight?.top_complaints?.slice(0, 3).map((complaint, idx) => (
-                  <div key={idx} className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                    <div className="w-6 h-6 bg-red-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-red-400 text-xs font-bold">{idx + 1}</span>
+                {thingsToKnow.slice(0, 3).map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                    <div className="w-6 h-6 bg-amber-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-amber-400 text-xs font-bold">{idx + 1}</span>
                     </div>
                     <div className="flex-1">
-                      <p className="text-white text-sm font-medium">{complaint.title}</p>
-                      <p className="text-red-400 text-xs mt-1">{complaint.frequency}</p>
+                      <p className="text-white text-sm font-medium">{item.title}</p>
+                      <p className="text-amber-400 text-xs mt-1">{item.frequency}</p>
                     </div>
                   </div>
                 ))}
@@ -368,11 +382,11 @@ export default function PublicInsightPage() {
               <p className="text-slate-300 text-sm leading-relaxed">{insight?.summary}</p>
             </div>
 
-            {/* Ideal Buyers */}
+            {/* Best Suited For (Safe Core naming - positive framing) */}
             <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-4">
                 <UserCheck className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-lg font-semibold text-white">Ideal For</h3>
+                <h3 className="text-lg font-semibold text-white">Best Suited For</h3>
               </div>
               <ul className="space-y-2">
                 {idealBuyers.map((buyer, idx) => (
@@ -384,16 +398,16 @@ export default function PublicInsightPage() {
               </ul>
             </div>
 
-            {/* Not Ideal For */}
+            {/* Who It Works For */}
             <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-4">
-                <UserX className="w-5 h-5 text-red-400" />
-                <h3 className="text-lg font-semibold text-white">Not Ideal For</h3>
+                <Users className="w-5 h-5 text-blue-400" />
+                <h3 className="text-lg font-semibold text-white">User Fit</h3>
               </div>
               <ul className="space-y-2">
-                {insight?.who_should_not_buy?.map((item, idx) => (
+                {bestSuitedFor.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-2 text-sm">
-                    <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
                     <span className="text-slate-300">{item}</span>
                   </li>
                 ))}
@@ -426,7 +440,7 @@ export default function PublicInsightPage() {
               <div className="bg-slate-800/50 border border-white/5 rounded-2xl p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <TrendingUp className="w-5 h-5 text-emerald-400" />
-                  <h3 className="text-lg font-semibold text-white">Review Trends</h3>
+                  <h3 className="text-lg font-semibold text-white">Feedback Trends</h3>
                 </div>
                 <div className="h-32 bg-slate-700/50 rounded-xl"></div>
               </div>
@@ -449,7 +463,7 @@ export default function PublicInsightPage() {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Unlock Premium Insights</h3>
                 <p className="text-slate-400 text-sm mb-6">
-                  Get advanced analytics, trend analysis, and seller dashboards with a Veriqo subscription.
+                  Get advanced analytics, trend analysis, and more with a Veriqo subscription.
                 </p>
                 <div className="space-y-3">
                   <Link to="/register" className="block">
@@ -485,13 +499,13 @@ export default function PublicInsightPage() {
           </Link>
         </div>
 
-        {/* Disclaimer */}
+        {/* Disclaimer (Safe Core) */}
         <div className="text-center text-slate-500 text-xs mb-8 space-y-1">
           <p>
-            This analysis is generated by AI based on publicly available customer reviews.
+            This summary is based on aggregated public customer feedback and is for informational purposes only.
           </p>
           <p>
-            Veriqo is not affiliated with Amazon. This content is for informational purposes only.
+            Veriqo provides independent informational summaries and is not affiliated with Amazon or any brand.
           </p>
           <p>
             As an Amazon Associate, Veriqo earns from qualifying purchases.
@@ -508,7 +522,7 @@ export default function PublicInsightPage() {
             </div>
             <span className="font-semibold text-white">Veriqo</span>
           </Link>
-          <p className="text-slate-500 text-sm">© 2024 Veriqo. Verify before you buy.</p>
+          <p className="text-slate-500 text-sm">© 2024 Veriqo. Product insights made simple.</p>
           <div className="flex items-center gap-4">
             <Link to="/shoppers" className="text-slate-500 hover:text-white text-sm">For Shoppers</Link>
             <Link to="/sellers" className="text-slate-500 hover:text-white text-sm">For Sellers</Link>
