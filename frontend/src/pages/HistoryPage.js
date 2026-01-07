@@ -5,12 +5,33 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import { 
   ArrowLeft, Download, Search, Filter, Calendar, 
-  ShoppingBag, CheckCircle, AlertTriangle, XCircle,
+  ShoppingBag, CheckCircle, Info, Lightbulb,
   ChevronRight, Loader2, FileDown, Clock, TrendingUp
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
+
+// Safe Core: Helper to normalize verdict from old/new formats
+const normalizeVerdict = (v) => {
+  const map = {
+    'buy': 'great_match', 'BUY': 'great_match', 'great_match': 'great_match',
+    'think': 'good_match', 'THINK': 'good_match', 'good_match': 'good_match',
+    'avoid': 'consider_options', 'AVOID': 'consider_options', 'consider_options': 'consider_options'
+  };
+  return map[v] || 'good_match';
+};
+
+// Safe Core: Get display label for verdict
+const getVerdictLabel = (verdict) => {
+  const normalized = normalizeVerdict(verdict);
+  const labels = {
+    'great_match': 'Great Match',
+    'good_match': 'Good Match',
+    'consider_options': 'Consider Options'
+  };
+  return labels[normalized] || 'Good Match';
+};
 
 export default function HistoryPage() {
   const { user, token } = useAuth();
@@ -73,26 +94,28 @@ export default function HistoryPage() {
   };
 
   const getVerdictIcon = (verdict) => {
-    switch (verdict?.toUpperCase()) {
-      case 'BUY':
+    const normalized = normalizeVerdict(verdict);
+    switch (normalized) {
+      case 'great_match':
         return <CheckCircle className="w-5 h-5 text-emerald-400" />;
-      case 'THINK':
-        return <AlertTriangle className="w-5 h-5 text-amber-400" />;
-      case 'AVOID':
-        return <XCircle className="w-5 h-5 text-red-400" />;
+      case 'good_match':
+        return <Info className="w-5 h-5 text-amber-400" />;
+      case 'consider_options':
+        return <Lightbulb className="w-5 h-5 text-indigo-400" />;
       default:
         return <ShoppingBag className="w-5 h-5 text-slate-400" />;
     }
   };
 
   const getVerdictStyles = (verdict) => {
-    switch (verdict?.toUpperCase()) {
-      case 'BUY':
+    const normalized = normalizeVerdict(verdict);
+    switch (normalized) {
+      case 'great_match':
         return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-      case 'THINK':
+      case 'good_match':
         return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-      case 'AVOID':
-        return 'bg-red-500/10 text-red-400 border-red-500/30';
+      case 'consider_options':
+        return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30';
       default:
         return 'bg-slate-500/10 text-slate-400 border-slate-500/30';
     }
@@ -109,12 +132,18 @@ export default function HistoryPage() {
     });
   };
 
-  // Filter analyses
+  // Filter analyses (Safe Core: use normalized verdicts)
   const filteredAnalyses = analyses.filter(analysis => {
     const matchesSearch = analysis.product_name?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterVerdict === 'all' || analysis.verdict?.toUpperCase() === filterVerdict;
+    const normalized = normalizeVerdict(analysis.verdict);
+    const matchesFilter = filterVerdict === 'all' || normalized === filterVerdict;
     return matchesSearch && matchesFilter;
   });
+
+  // Count by normalized verdict
+  const greatMatchCount = analyses.filter(a => normalizeVerdict(a.verdict) === 'great_match').length;
+  const goodMatchCount = analyses.filter(a => normalizeVerdict(a.verdict) === 'good_match').length;
+  const considerCount = analyses.filter(a => normalizeVerdict(a.verdict) === 'consider_options').length;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -152,7 +181,7 @@ export default function HistoryPage() {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats */}
+        {/* Stats - Safe Core naming */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-slate-800/50 border border-white/5 rounded-xl p-4">
             <div className="flex items-center gap-2 text-slate-400 mb-2">
@@ -164,33 +193,27 @@ export default function HistoryPage() {
           <div className="bg-slate-800/50 border border-white/5 rounded-xl p-4">
             <div className="flex items-center gap-2 text-emerald-400 mb-2">
               <CheckCircle className="w-4 h-4" />
-              <span className="text-sm">Buy</span>
+              <span className="text-sm">Great Match</span>
             </div>
-            <p className="text-2xl font-bold text-white">
-              {analyses.filter(a => a.verdict?.toUpperCase() === 'BUY').length}
-            </p>
+            <p className="text-2xl font-bold text-white">{greatMatchCount}</p>
           </div>
           <div className="bg-slate-800/50 border border-white/5 rounded-xl p-4">
             <div className="flex items-center gap-2 text-amber-400 mb-2">
-              <AlertTriangle className="w-4 h-4" />
-              <span className="text-sm">Think</span>
+              <Info className="w-4 h-4" />
+              <span className="text-sm">Good Match</span>
             </div>
-            <p className="text-2xl font-bold text-white">
-              {analyses.filter(a => a.verdict?.toUpperCase() === 'THINK').length}
-            </p>
+            <p className="text-2xl font-bold text-white">{goodMatchCount}</p>
           </div>
           <div className="bg-slate-800/50 border border-white/5 rounded-xl p-4">
-            <div className="flex items-center gap-2 text-red-400 mb-2">
-              <XCircle className="w-4 h-4" />
-              <span className="text-sm">Avoid</span>
+            <div className="flex items-center gap-2 text-indigo-400 mb-2">
+              <Lightbulb className="w-4 h-4" />
+              <span className="text-sm">Consider</span>
             </div>
-            <p className="text-2xl font-bold text-white">
-              {analyses.filter(a => a.verdict?.toUpperCase() === 'AVOID').length}
-            </p>
+            <p className="text-2xl font-bold text-white">{considerCount}</p>
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Filters - Safe Core naming */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -202,18 +225,23 @@ export default function HistoryPage() {
               className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
             />
           </div>
-          <div className="flex gap-2">
-            {['all', 'BUY', 'THINK', 'AVOID'].map((filter) => (
+          <div className="flex gap-2 flex-wrap">
+            {[
+              { key: 'all', label: 'All' },
+              { key: 'great_match', label: 'Great Match' },
+              { key: 'good_match', label: 'Good Match' },
+              { key: 'consider_options', label: 'Consider' }
+            ].map((filter) => (
               <Button
-                key={filter}
-                onClick={() => setFilterVerdict(filter)}
-                variant={filterVerdict === filter ? 'default' : 'outline'}
-                className={filterVerdict === filter 
+                key={filter.key}
+                onClick={() => setFilterVerdict(filter.key)}
+                variant={filterVerdict === filter.key ? 'default' : 'outline'}
+                className={filterVerdict === filter.key 
                   ? 'bg-blue-600 hover:bg-blue-500 text-white' 
                   : 'border-white/10 text-slate-400 hover:text-white hover:bg-white/5'
                 }
               >
-                {filter === 'all' ? 'All' : filter}
+                {filter.label}
               </Button>
             ))}
           </div>
@@ -272,7 +300,7 @@ export default function HistoryPage() {
                       <div className="flex items-center gap-3 mt-1">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${getVerdictStyles(analysis.verdict)}`}>
                           {getVerdictIcon(analysis.verdict)}
-                          {analysis.verdict}
+                          {getVerdictLabel(analysis.verdict)}
                         </span>
                         <span className="text-slate-400 text-sm flex items-center gap-1">
                           <TrendingUp className="w-3 h-3" />
