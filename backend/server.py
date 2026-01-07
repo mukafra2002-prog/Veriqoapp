@@ -853,11 +853,10 @@ Provide a NEUTRAL summary of feedback patterns with a verdict. Remember to use h
 async def perform_ai_analysis_legacy(amazon_url: str) -> dict:
     """Legacy wrapper for backward compatibility"""
     return await perform_ai_analysis(amazon_url, user_id=None)
-            "alternatives": [
-                {"name": "Higher-rated alternative in same category", "reason": "Better reviews and quality"},
-                {"name": "Budget-friendly option", "reason": "Similar features at lower price"}
-            ]
-        }
+
+async def analyze_amazon_product(amazon_url: str) -> dict:
+    """Wrapper for backward compatibility with comparison feature"""
+    result = await perform_ai_analysis(amazon_url, user_id=None)
     
     affiliate_tag = "veriqo-20"
     affiliate_url = f"{amazon_url}?tag={affiliate_tag}" if "?" not in amazon_url else f"{amazon_url}&tag={affiliate_tag}"
