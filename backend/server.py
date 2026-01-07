@@ -166,13 +166,19 @@ class ProductAnalysisResponse(BaseModel):
     amazon_url: str
     verdict: str  # great_match, good_match, consider_options
     confidence_score: int
-    things_to_know: List[ThingToKnow]  # Renamed from top_complaints
-    best_suited_for: List[str]  # Renamed from who_should_not_buy (now positive framing)
+    # Safe Core: Support both old and new field names for backward compatibility
+    things_to_know: Optional[List[ThingToKnow]] = None  # Renamed from top_complaints
+    top_complaints: Optional[List[ThingToKnow]] = None  # Legacy field for backward compatibility
+    best_suited_for: Optional[List[str]] = None  # Renamed from who_should_not_buy (now positive framing)
+    who_should_not_buy: Optional[List[str]] = None  # Legacy field for backward compatibility
     summary: str
     affiliate_url: str
     analyzed_at: str
     positive_highlights: Optional[List[str]] = None
     disclaimers: Optional[dict] = None
+    # Legacy fields that may exist in old data (excluded from Safe Core)
+    authenticity_score: Optional[int] = None
+    alternatives: Optional[List[dict]] = None
 
 class WishlistItem(BaseModel):
     id: str
