@@ -673,11 +673,12 @@ async def cache_analysis(url_hash: str, result: dict):
     )
 
 def sanitize_ai_output(result: dict) -> dict:
-    """Sanitize AI output to ensure neutral language and add required disclaimers"""
+    """Sanitize AI output to ensure neutral language and add required disclaimers (Safe Core)"""
     # Forbidden phrases to remove
     forbidden_phrases = [
         "fake review", "fraudulent", "scam", "dishonest", "lying",
-        "definitely", "certainly", "you must", "you should definitely"
+        "definitely", "certainly", "you must", "you should definitely",
+        "avoid", "don't buy", "do not buy"
     ]
     
     # Sanitize text fields
@@ -689,20 +690,57 @@ def sanitize_ai_output(result: dict) -> dict:
                 text = text.replace(phrase.title(), "")
             result[field] = text
     
-    # Sanitize complaints
-    if "top_complaints" in result:
-        for complaint in result["top_complaints"]:
-            if "description" in complaint:
-                text = complaint["description"]
+    # Map old verdict format to new Safe Core verdicts
+    verdict_mapping = {
+        "buy": "great_match",
+        "BUY": "great_match",
+        "think": "good_match",
+        "THINK": "good_match",
+        "avoid": "consider_options",
+        "AVOID": "consider_options"
+    }
+    if result.get("verdict") in verdict_mapping:
+        result["verdict"] = verdict_mapping[result["verdict"]]
+    
+    # Rename old fields to new Safe Core naming
+    if "top_complaints" in result and "things_to_know" not in result:
+        result["things_to_know"] = result.pop("top_complaints")
+    
+    # Sanitize things_to_know (formerly complaints)
+    if "things_to_know" in result:
+        for item in result["things_to_know"]:
+            if "description" in item:
+                text = item["description"]
                 for phrase in forbidden_phrases:
                     text = text.replace(phrase, "")
-                complaint["description"] = text
+                item["description"] = text
     
-    # Remove authenticity_score if it makes accusations
-    # Instead, we just won't display it prominently
+    # Transform who_should_not_buy to best_suited_for (positive framing)
+    if "who_should_not_buy" in result and "best_suited_for" not in result:
+        # Convert negative framing to positive
+        negatives = result.pop("who_should_not_buy")
+        positives = []
+        for neg in negatives:
+            # Simple transformation from negative to positive framing
+            if "premium" in neg.lower():
+                positives.append("Budget-conscious shoppers looking for good value")
+            elif "urgent" in neg.lower() or "fast" in neg.lower():
+                positives.append("Users who can wait for standard delivery times")
+            elif "quality" in neg.lower():
+                positives.append("Those prioritizing functionality over premium finish")
+            else:
+                positives.append("Users with flexible expectations")
+        result["best_suited_for"] = positives if positives else ["General consumers with typical use cases"]
+    
+    # Remove any authenticity_score (Safe Core doesn't include this)
     if "authenticity_score" in result:
-        # Keep it but ensure it's not used to make accusations
-        result["review_quality_indicator"] = result.pop("authenticity_score")
+        del result["authenticity_score"]
+    if "review_quality_indicator" in result:
+        del result["review_quality_indicator"]
+    
+    # Remove alternatives (not part of Safe Core)
+    if "alternatives" in result:
+        del result["alternatives"]
     
     # Add required disclaimers
     result["disclaimers"] = REQUIRED_DISCLAIMERS
