@@ -139,17 +139,31 @@ code, .mono {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Verdict Colors */
-.verdict-buy {
+/* Verdict Colors - Safe Core */
+.verdict-great_match, .verdict-buy {
   --verdict-color: #10B981;
 }
 
-.verdict-think {
+.verdict-good_match, .verdict-think {
   --verdict-color: #F59E0B;
 }
 
-.verdict-avoid {
-  --verdict-color: #EF4444;
+.verdict-consider_options, .verdict-avoid {
+  --verdict-color: #6366F1;
+}
+
+.verdict-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--verdict-color);
+  background: color-mix(in srgb, var(--verdict-color) 10%, transparent);
+  color: var(--verdict-color);
 }
 
 /* Custom Scrollbar */
