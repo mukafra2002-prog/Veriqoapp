@@ -841,6 +841,12 @@ Provide a NEUTRAL summary of feedback patterns with a verdict. Remember to use h
     # Sanitize output and add disclaimers
     result = sanitize_ai_output(result)
     
+    # Add affiliate URL
+    affiliate_tag = "veriqo-20"
+    affiliate_url = f"{amazon_url}?tag={affiliate_tag}" if "?" not in amazon_url else f"{amazon_url}&tag={affiliate_tag}"
+    result["amazon_url"] = amazon_url
+    result["affiliate_url"] = affiliate_url
+    
     # Cache the result
     await cache_analysis(url_hash, result)
     
