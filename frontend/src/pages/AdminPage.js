@@ -25,9 +25,19 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Check if user is admin on frontend
   useEffect(() => {
-    fetchAdminData();
-  }, []);
+    if (user && !user.is_admin) {
+      toast.error('Admin access required');
+      navigate('/home');
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
+    if (user?.is_admin) {
+      fetchAdminData();
+    }
+  }, [user]);
 
   const fetchAdminData = async () => {
     try {
