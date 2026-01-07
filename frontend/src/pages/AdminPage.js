@@ -558,7 +558,24 @@ export default function AdminPage() {
                 Recent Analyses
               </h3>
               <div className="space-y-3">
-                {analyses.slice(0, 5).map((a) => (
+                {analyses.slice(0, 5).map((a) => {
+                  // Safe Core: normalize verdict
+                  const normalizeVerdict = (v) => {
+                    const map = {
+                      'buy': 'great_match', 'BUY': 'great_match', 'great_match': 'great_match',
+                      'think': 'good_match', 'THINK': 'good_match', 'good_match': 'good_match',
+                      'avoid': 'consider_options', 'AVOID': 'consider_options', 'consider_options': 'consider_options'
+                    };
+                    return map[v] || 'good_match';
+                  };
+                  const getVerdictLabel = (v) => {
+                    const normalized = normalizeVerdict(v);
+                    const labels = { 'great_match': 'Great', 'good_match': 'Good', 'consider_options': 'Consider' };
+                    return labels[normalized] || 'Good';
+                  };
+                  const normalized = normalizeVerdict(a.verdict);
+                  
+                  return (
                   <div key={a.id} className="flex items-center justify-between p-3 bg-slate-900/50 rounded-xl">
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm truncate">{a.product_name}</p>
@@ -567,15 +584,16 @@ export default function AdminPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-white font-medium">{a.confidence_score}%</span>
                       <span className={`px-2 py-0.5 rounded text-xs ${
-                        a.verdict === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' :
-                        a.verdict === 'THINK' ? 'bg-amber-500/20 text-amber-400' :
-                        'bg-red-500/20 text-red-400'
+                        normalized === 'great_match' ? 'bg-emerald-500/20 text-emerald-400' :
+                        normalized === 'good_match' ? 'bg-amber-500/20 text-amber-400' :
+                        'bg-indigo-500/20 text-indigo-400'
                       }`}>
-                        {a.verdict}
+                        {getVerdictLabel(a.verdict)}
                       </span>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
