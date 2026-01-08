@@ -19,8 +19,8 @@ const shopperPlans = [
     description: 'Perfect for casual shoppers',
     features: [
       '3 product checks per month',
-      'Buy/Think/Avoid verdict',
-      'Top complaints view',
+      'Product match insights',
+      'Things to know view',
       'Basic support'
     ],
     popular: false,
