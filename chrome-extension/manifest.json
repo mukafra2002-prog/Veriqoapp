@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Veriqo - Amazon Product Insights",
+  "version": "1.0.0",
+  "description": "Get AI-powered product insights while shopping on Amazon. Know before you buy!",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://www.amazon.com/*",
+    "https://amazon.com/*",
+    "https://smart-review-6.preview.emergentagent.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.amazon.com/*",
+        "https://amazon.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*", "styles/*"],
+      "matches": ["https://www.amazon.com/*", "https://amazon.com/*"]
+    }
+  ]
+}
