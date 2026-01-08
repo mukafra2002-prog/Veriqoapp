@@ -121,7 +121,7 @@ export default function PricingPage() {
   const handleSubscribe = async (planId) => {
     if (planId === 'free' || planId === 'enterprise') {
       if (planId === 'enterprise') {
-        window.location.href = 'mailto:enterprise@veriqoapp.com?subject=Enterprise%20Plan%20Inquiry';
+        navigate('/enterprise');
       }
       return;
     }
