@@ -74,52 +74,34 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+        <!-- Veriqo Footer Badge -->
         <a
-            id="emergent-badge"
-            target="_blank"
-            href="https://app.emergent.sh/?utm_source=emergent-badge"
+            id="veriqo-footer-badge"
             style="
                 display: flex !important;
                 align-items: center !important;
+                justify-content: center !important;
+                gap: 16px !important;
                 position: fixed !important;
-                bottom: 20px;
-                right: 20px;
+                bottom: 0;
+                left: 0;
+                right: 0;
                 text-decoration: none;
-                padding: 6px 10px;
+                padding: 8px 16px;
                 font-family: -apple-system, BlinkMacSystemFont,
-                    &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell,
-                    &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;,
+                    'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+                    'Open Sans', 'Helvetica Neue',
                     sans-serif !important;
                 font-size: 12px !important;
                 z-index: 9999 !important;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-                border-radius: 8px !important;
-                background-color: #ffffff !important;
-                border: 1px solid rgba(255, 255, 255, 0.25) !important;
+                background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%) !important;
+                border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
             "
         >
-            <div
-                style="display: flex; flex-direction: row; align-items: center"
-            >
-                <img
-                    style="width: 20px; height: 20px; margin-right: 8px"
-                    src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4"
-                />
-                <p
-                    style="
-                        color: #000000;
-                        font-family: -apple-system, BlinkMacSystemFont,
-                            &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu,
-                            Cantarell, &quot;Open Sans&quot;,
-                            &quot;Helvetica Neue&quot;, sans-serif !important;
-                        font-size: 12px !important;
-                        align-items: center;
-                        margin-bottom: 0;
-                    "
-                >
-                    Made with Emergent
-                </p>
-            </div>
+            <span style="color: #94A3B8; font-weight: 600;">Veriqo</span>
+            <span style="color: #64748B;">© 2025</span>
+            <a href="/disclaimer" style="color: #64748B; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#3B82F6'" onmouseout="this.style.color='#64748B'">Disclaimer</a>
+            <a href="/privacy" style="color: #64748B; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#3B82F6'" onmouseout="this.style.color='#64748B'">Privacy</a>
         </a>
         <script>
             !(function (t, e) {
