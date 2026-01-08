@@ -633,6 +633,93 @@ async def analyze_product(data: ProductAnalysisRequest, user: dict = Depends(get
 
 # ==================== AI SAFETY FUNCTIONS ====================
 
+# ==================== CHROME EXTENSION API ====================
+
+class ExtensionAnalysisRequest(BaseModel):
+    amazon_url: str
+    extension_id: Optional[str] = None
+
+@api_router.post("/extension/analyze", response_model=ProductAnalysisResponse)
+async def extension_analyze_product(data: ExtensionAnalysisRequest, request: Request):
+    """
+    Chrome Extension endpoint - allows limited free analysis without authentication.
+    Tracks usage by IP address for rate limiting.
+    """
+    # Get client IP for rate limiting
+    client_ip = request.client.host if request.client else "unknown"
+    
+    # Check daily limit for this IP (3 free checks per day)
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_count = await db.extension_usage.count_documents({
+        "ip": client_ip,
+        "timestamp": {"$gte": today.isoformat()}
+    })
+    
+    if today_count >= 3:
+        raise HTTPException(
+            status_code=403, 
+            detail="Daily free limit reached. Sign up at veriqo.com for unlimited access!"
+        )
+    
+    if "amazon.com" not in data.amazon_url and "amzn.to" not in data.amazon_url:
+        raise HTTPException(status_code=400, detail="Please provide a valid Amazon product URL")
+    
+    try:
+        analysis = await perform_ai_analysis(data.amazon_url, user_id=f"ext_{client_ip}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Extension AI Analysis error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to analyze product. Please try again.")
+    
+    # Log extension usage
+    await db.extension_usage.insert_one({
+        "id": str(uuid.uuid4()),
+        "ip": client_ip,
+        "amazon_url": data.amazon_url,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    })
+    
+    # Generate analysis ID and save
+    analysis_id = str(uuid.uuid4())
+    analysis_doc = {
+        "id": analysis_id,
+        "user_id": f"extension_{client_ip}",
+        "product_url": data.amazon_url,
+        "product_name": analysis.get("product_name"),
+        "product_image": analysis.get("product_image"),
+        "amazon_url": data.amazon_url,
+        "verdict": analysis.get("verdict"),
+        "confidence_score": analysis.get("confidence_score"),
+        "things_to_know": analysis.get("things_to_know"),
+        "best_suited_for": analysis.get("best_suited_for"),
+        "summary": analysis.get("summary"),
+        "positive_highlights": analysis.get("positive_highlights"),
+        "affiliate_url": analysis.get("affiliate_url"),
+        "analyzed_at": datetime.now(timezone.utc).isoformat(),
+        "source": "chrome_extension"
+    }
+    
+    await db.product_analyses.insert_one(analysis_doc)
+    
+    return ProductAnalysisResponse(
+        id=analysis_id,
+        product_name=analysis.get("product_name", "Amazon Product"),
+        product_image=analysis.get("product_image"),
+        amazon_url=data.amazon_url,
+        verdict=analysis.get("verdict", "good_match"),
+        confidence_score=analysis.get("confidence_score", 70),
+        things_to_know=analysis.get("things_to_know", []),
+        best_suited_for=analysis.get("best_suited_for", []),
+        summary=analysis.get("summary", ""),
+        affiliate_url=analysis.get("affiliate_url", data.amazon_url),
+        analyzed_at=analysis_doc["analyzed_at"],
+        positive_highlights=analysis.get("positive_highlights"),
+        disclaimers=analysis.get("disclaimers")
+    )
+
+# ==================== AI HELPER FUNCTIONS ====================
+
 async def check_ai_enabled():
     """Check if AI is enabled (emergency disable switch)"""
     if not AI_CONFIG["enabled"]:
