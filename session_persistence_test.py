@@ -17,8 +17,8 @@ import time
 
 class SessionPersistenceTest:
     def __init__(self):
-        self.frontend_url = "https://smart-review-6.preview.emergentagent.com"
-        self.api_url = "https://smart-review-6.preview.emergentagent.com/api"
+        self.frontend_url = "https://veriqo-check.preview.emergentagent.com"
+        self.api_url = "https://veriqo-check.preview.emergentagent.com/api"
         self.driver = None
         self.token = None
         

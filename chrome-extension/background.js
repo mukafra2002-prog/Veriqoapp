@@ -1,5 +1,5 @@
 // Veriqo Chrome Extension - Background Service Worker
-const API_URL = 'https://smart-review-6.preview.emergentagent.com/api';
+const API_URL = 'https://veriqo-check.preview.emergentagent.com/api';
 const FREE_CHECKS_LIMIT = 3;
 
 // Initialize extension storage

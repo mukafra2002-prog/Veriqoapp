@@ -43,7 +43,7 @@ function updateUI(status) {
     
     if (remaining === 0) {
       checksBadge.className = 'checks-badge empty';
-      checksBadge.innerHTML = '0 free checks remaining - <a href="https://smart-review-6.preview.emergentagent.com/register" target="_blank" style="color: inherit; text-decoration: underline;">Sign up</a>';
+      checksBadge.innerHTML = '0 free checks remaining - <a href="https://veriqo-check.preview.emergentagent.com/register" target="_blank" style="color: inherit; text-decoration: underline;">Sign up</a>';
     } else if (remaining === 1) {
       checksBadge.className = 'checks-badge warning';
     } else {

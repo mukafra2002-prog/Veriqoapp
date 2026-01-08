@@ -11,7 +11,7 @@ import time
 
 class SessionPersistenceAPITest:
     def __init__(self):
-        self.api_url = "https://smart-review-6.preview.emergentagent.com/api"
+        self.api_url = "https://veriqo-check.preview.emergentagent.com/api"
         self.token = None
         self.user_data = None
         

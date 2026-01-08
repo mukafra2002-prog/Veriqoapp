@@ -57,7 +57,7 @@ The extension folder is located at `/app/chrome-extension/`
 2. Enter your Veriqo account email/password
 3. Enjoy unlimited product insights!
 
-Don't have an account? [Sign up free](https://smart-review-6.preview.emergentagent.com/register)
+Don't have an account? [Sign up free](https://veriqo-check.preview.emergentagent.com/register)
 
 ## Troubleshooting
 
@@ -76,12 +76,12 @@ Don't have an account? [Sign up free](https://smart-review-6.preview.emergentage
 - We only access Amazon product pages
 - No browsing data is collected
 - Analysis data is encrypted
-- See our [Privacy Policy](https://smart-review-6.preview.emergentagent.com/privacy)
+- See our [Privacy Policy](https://veriqo-check.preview.emergentagent.com/privacy)
 
 ## Support
 
 - Email: support@veriqo.com
-- Website: https://smart-review-6.preview.emergentagent.com
+- Website: https://veriqo-check.preview.emergentagent.com
 
 ---
 

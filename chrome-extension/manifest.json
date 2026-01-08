@@ -10,7 +10,7 @@
   "host_permissions": [
     "https://www.amazon.com/*",
     "https://amazon.com/*",
-    "https://smart-review-6.preview.emergentagent.com/*"
+    "https://veriqo-check.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

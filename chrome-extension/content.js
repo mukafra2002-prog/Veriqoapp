@@ -142,7 +142,7 @@
             <div class="veriqo-item">• ${item.title}</div>
           `).join('')}
         </div>
-        <a href="https://smart-review-6.preview.emergentagent.com/results/${analysis.id}" target="_blank" class="veriqo-full-report">
+        <a href="https://veriqo-check.preview.emergentagent.com/results/${analysis.id}" target="_blank" class="veriqo-full-report">
           View Full Report →
         </a>
       </div>
@@ -170,10 +170,10 @@
           <div class="veriqo-signup-icon">🔒</div>
           <div class="veriqo-signup-title">Free Checks Used</div>
           <div class="veriqo-signup-text">You've used all 3 free checks. Sign up for unlimited product insights!</div>
-          <a href="https://smart-review-6.preview.emergentagent.com/register" target="_blank" class="veriqo-signup-btn">
+          <a href="https://veriqo-check.preview.emergentagent.com/register" target="_blank" class="veriqo-signup-btn">
             Sign Up Free
           </a>
-          <a href="https://smart-review-6.preview.emergentagent.com/login" target="_blank" class="veriqo-login-link">
+          <a href="https://veriqo-check.preview.emergentagent.com/login" target="_blank" class="veriqo-login-link">
             Already have an account? Log in
           </a>
         </div>
