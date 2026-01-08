@@ -27,6 +27,7 @@ import DisclaimerPage from "./pages/DisclaimerPage";
 import TrustPage from "./pages/TrustPage";
 import ContactPage from "./pages/ContactPage";
 import FAQPage from "./pages/FAQPage";
+import EnterprisePage from "./pages/EnterprisePage";
 import "./App.css";
 
 // Protected Route Component
