@@ -362,12 +362,14 @@ export default function PricingPage() {
               <p className="text-slate-400 mb-4">
                 Need a custom solution? Talk to our enterprise team.
               </p>
-              <a href="mailto:enterprise@veriqoapp.com">
-                <Button variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10 text-white">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Contact Enterprise Sales
-                </Button>
-              </a>
+              <Button 
+                variant="outline" 
+                className="border-white/10 bg-white/5 hover:bg-white/10 text-white"
+                onClick={() => navigate('/enterprise')}
+              >
+                <Building2 className="w-4 h-4 mr-2" />
+                Contact Enterprise Sales
+              </Button>
             </div>
           </TabsContent>
         </Tabs>
