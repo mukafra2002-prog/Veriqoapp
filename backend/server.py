@@ -807,8 +807,7 @@ Provide a NEUTRAL summary of feedback patterns with a verdict. Remember to use h
     chat = LlmChat(
         api_key=api_key,
         session_id=f"veriqo-analysis-{uuid.uuid4()}",
-        system_message=AI_SYSTEM_PROMPT,
-        max_tokens=AI_CONFIG["max_tokens_per_request"]  # Token limit
+        system_message=AI_SYSTEM_PROMPT
     ).with_model("openai", "gpt-4o-mini")  # Use smaller model for cost control
     
     user_message = UserMessage(text=prompt)
