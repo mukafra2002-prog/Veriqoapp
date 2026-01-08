@@ -249,13 +249,14 @@ def get_user_response(user: dict) -> UserResponse:
         id=user["id"],
         email=user.get("email"),
         phone=user.get("phone"),
-        name=user["name"],
+        name=user.get("name", "User"),
         picture=user.get("picture"),
         subscription_type=user.get("subscription_type", "free"),
         subscription_expires=user.get("subscription_expires"),
         checks_used_this_month=user.get("checks_used_this_month", 0),
         checks_remaining=checks_remaining,
         onboarding_completed=user.get("onboarding_completed", False),
+        is_admin=user.get("is_admin", False),
         created_at=user.get("created_at", "")
     )
 
