@@ -113,6 +113,10 @@ export const Navbar = () => {
                     <Heart className="w-4 h-4 mr-2" />
                     My Wishlist
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/price-alerts')} className="text-slate-300 focus:bg-white/10 focus:text-white">
+                    <Bell className="w-4 h-4 mr-2" />
+                    Price Alerts
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/history')} className="text-slate-300 focus:bg-white/10 focus:text-white">
                     <History className="w-4 h-4 mr-2" />
                     History
