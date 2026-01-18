@@ -313,7 +313,7 @@ export default function PriceAlertsPage() {
                           )}
                         </Button>
                         <a
-                          href={alert.product_url}
+                          href={`${alert.product_url}${alert.product_url.includes('?') ? '&' : '?'}tag=framouka-20`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300"
