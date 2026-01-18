@@ -200,6 +200,24 @@ class CheckoutResponse(BaseModel):
     url: str
     session_id: str
 
+class PriceAlertRequest(BaseModel):
+    product_url: str
+    target_price: Optional[float] = None  # Alert when price drops below this
+    
+class PriceAlertResponse(BaseModel):
+    id: str
+    user_id: str
+    product_url: str
+    product_name: str
+    product_image: Optional[str] = None
+    original_price: Optional[float] = None
+    current_price: Optional[float] = None
+    target_price: Optional[float] = None
+    is_active: bool
+    created_at: str
+    last_checked: Optional[str] = None
+    price_dropped: bool = False
+
 # Helper Functions
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
