@@ -28,6 +28,7 @@ import TrustPage from "./pages/TrustPage";
 import ContactPage from "./pages/ContactPage";
 import FAQPage from "./pages/FAQPage";
 import EnterprisePage from "./pages/EnterprisePage";
+import PriceAlertsPage from "./pages/PriceAlertsPage";
 import "./App.css";
 
 // Protected Route Component
