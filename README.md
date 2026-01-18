@@ -82,15 +82,18 @@ yarn start
 | `MONGO_URL` | MongoDB connection string | ✅ |
 | `DB_NAME` | Database name | ✅ |
 | `JWT_SECRET` | Secret for JWT tokens | ✅ |
-| `EMERGENT_LLM_KEY` | OpenAI API key | ✅ |
+| `OPENAI_API_KEY` | OpenAI API key | ✅ |
 | `STRIPE_API_KEY` | Stripe secret key | ✅ |
-| `RESEND_API_KEY` | Resend email API key | Optional |
+| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | ✅ |
+| `RESEND_API_KEY` | Resend email API key | ✅ |
+| `AMAZON_AFFILIATE_TAG` | Amazon Associates tracking ID | ✅ |
 | `CORS_ORIGINS` | Allowed origins | ✅ |
 
 ### Frontend (`frontend/.env`)
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `REACT_APP_BACKEND_URL` | Backend API URL | ✅ |
+| `REACT_APP_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | ✅ |
 
 ## 📁 API Endpoints
 
