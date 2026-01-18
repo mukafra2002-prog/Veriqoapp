@@ -144,7 +144,7 @@ export default function WishlistPage() {
                       Analyze
                     </Button>
                     <a 
-                      href={item.product_url}
+                      href={`${item.product_url}${item.product_url.includes('?') ? '&' : '?'}tag=framouka-20`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
