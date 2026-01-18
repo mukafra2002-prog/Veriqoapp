@@ -956,8 +956,7 @@ Provide a NEUTRAL summary of feedback patterns with a verdict. Remember to use h
     result = sanitize_ai_output(result)
     
     # Add affiliate URL
-    affiliate_tag = "framouka-20"
-    affiliate_url = f"{amazon_url}?tag={affiliate_tag}" if "?" not in amazon_url else f"{amazon_url}&tag={affiliate_tag}"
+    affiliate_url = f"{amazon_url}?tag={AMAZON_AFFILIATE_TAG}" if "?" not in amazon_url else f"{amazon_url}&tag={AMAZON_AFFILIATE_TAG}"
     result["amazon_url"] = amazon_url
     result["affiliate_url"] = affiliate_url
     
