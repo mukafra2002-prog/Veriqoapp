@@ -1576,6 +1576,181 @@ async def stripe_webhook(request: Request):
         logging.error(f"Webhook error: {e}")
         return {"status": "error"}
 
+# ============================================
+# PRICE DROP ALERTS
+# ============================================
+
+@api_router.post("/price-alerts", response_model=PriceAlertResponse)
+async def create_price_alert(data: PriceAlertRequest, user: dict = Depends(get_current_user)):
+    """Create a price drop alert for a product"""
+    # Scrape product info
+    product_info = await scrape_amazon_product(data.product_url)
+    
+    # Parse current price if available
+    current_price = None
+    if product_info.get("price"):
+        try:
+            price_str = product_info["price"].replace("$", "").replace(",", "").strip()
+            current_price = float(price_str)
+        except:
+            pass
+    
+    alert_id = str(uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    alert = {
+        "id": alert_id,
+        "user_id": user["id"],
+        "product_url": data.product_url,
+        "product_name": product_info.get("title", "Unknown Product"),
+        "product_image": product_info.get("image"),
+        "original_price": current_price,
+        "current_price": current_price,
+        "target_price": data.target_price or (current_price * 0.9 if current_price else None),  # Default 10% drop
+        "is_active": True,
+        "created_at": now,
+        "last_checked": now,
+        "price_dropped": False
+    }
+    
+    await db.price_alerts.insert_one(alert)
+    
+    return PriceAlertResponse(**{k: v for k, v in alert.items() if k != "_id"})
+
+@api_router.get("/price-alerts")
+async def get_price_alerts(user: dict = Depends(get_current_user)):
+    """Get all price alerts for the current user"""
+    alerts = await db.price_alerts.find(
+        {"user_id": user["id"]}, 
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    return alerts
+
+@api_router.delete("/price-alerts/{alert_id}")
+async def delete_price_alert(alert_id: str, user: dict = Depends(get_current_user)):
+    """Delete a price alert"""
+    result = await db.price_alerts.delete_one({
+        "id": alert_id,
+        "user_id": user["id"]
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    
+    return {"message": "Alert deleted"}
+
+@api_router.put("/price-alerts/{alert_id}/toggle")
+async def toggle_price_alert(alert_id: str, user: dict = Depends(get_current_user)):
+    """Toggle a price alert on/off"""
+    alert = await db.price_alerts.find_one({
+        "id": alert_id,
+        "user_id": user["id"]
+    }, {"_id": 0})
+    
+    if not alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    
+    new_status = not alert.get("is_active", True)
+    
+    await db.price_alerts.update_one(
+        {"id": alert_id},
+        {"$set": {"is_active": new_status}}
+    )
+    
+    return {"message": f"Alert {'activated' if new_status else 'deactivated'}", "is_active": new_status}
+
+@api_router.post("/price-alerts/check")
+async def check_price_alerts(user: dict = Depends(get_current_user)):
+    """Manually check all active price alerts for price drops"""
+    alerts = await db.price_alerts.find({
+        "user_id": user["id"],
+        "is_active": True
+    }, {"_id": 0}).to_list(100)
+    
+    dropped_alerts = []
+    
+    for alert in alerts:
+        try:
+            # Scrape current price
+            product_info = await scrape_amazon_product(alert["product_url"])
+            
+            current_price = None
+            if product_info.get("price"):
+                try:
+                    price_str = product_info["price"].replace("$", "").replace(",", "").strip()
+                    current_price = float(price_str)
+                except:
+                    pass
+            
+            if current_price:
+                now = datetime.now(timezone.utc).isoformat()
+                price_dropped = False
+                
+                # Check if price dropped below target
+                if alert.get("target_price") and current_price <= alert["target_price"]:
+                    price_dropped = True
+                    dropped_alerts.append({
+                        "product_name": alert["product_name"],
+                        "original_price": alert.get("original_price"),
+                        "current_price": current_price,
+                        "target_price": alert.get("target_price"),
+                        "product_url": alert["product_url"]
+                    })
+                    
+                    # Send email notification
+                    if resend.api_key:
+                        try:
+                            user_data = await db.users.find_one({"id": user["id"]}, {"_id": 0})
+                            if user_data and user_data.get("email"):
+                                savings = alert.get("original_price", current_price) - current_price
+                                params = {
+                                    "from": SENDER_EMAIL,
+                                    "to": [user_data["email"]],
+                                    "subject": f"🎉 Price Drop Alert: {alert['product_name'][:50]}",
+                                    "html": f"""
+                                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 32px; border-radius: 16px;">
+                                        <h2 style="color: #10b981; font-size: 24px; margin: 0 0 16px 0;">🎉 Price Drop Alert!</h2>
+                                        <p style="color: #e2e8f0; font-size: 16px; line-height: 1.6;">
+                                            Great news! A product on your watchlist just dropped in price.
+                                        </p>
+                                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0;">
+                                            <h3 style="color: #fff; margin: 0 0 12px 0;">{alert['product_name'][:100]}</h3>
+                                            <p style="color: #ef4444; font-size: 14px; margin: 0; text-decoration: line-through;">Original: ${alert.get('original_price', 'N/A')}</p>
+                                            <p style="color: #10b981; font-size: 24px; font-weight: bold; margin: 8px 0;">Now: ${current_price:.2f}</p>
+                                            <p style="color: #fbbf24; font-size: 14px; margin: 0;">You save: ${savings:.2f}!</p>
+                                        </div>
+                                        <a href="{alert['product_url']}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px;">
+                                            View Product
+                                        </a>
+                                        <p style="color: #64748b; font-size: 12px; margin-top: 24px;">
+                                            This alert was set up on Veriqo. You can manage your alerts in your dashboard.
+                                        </p>
+                                    </div>
+                                    """
+                                }
+                                await asyncio.to_thread(resend.Emails.send, params)
+                                logging.info(f"Price drop email sent for {alert['product_name']}")
+                        except Exception as e:
+                            logging.error(f"Failed to send price drop email: {e}")
+                
+                # Update alert with current price
+                await db.price_alerts.update_one(
+                    {"id": alert["id"]},
+                    {"$set": {
+                        "current_price": current_price,
+                        "last_checked": now,
+                        "price_dropped": price_dropped
+                    }}
+                )
+        except Exception as e:
+            logging.error(f"Error checking price for alert {alert['id']}: {e}")
+    
+    return {
+        "checked": len(alerts),
+        "price_drops": len(dropped_alerts),
+        "dropped_products": dropped_alerts
+    }
+
 # Health check
 @api_router.get("/")
 async def root():
