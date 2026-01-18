@@ -85,6 +85,9 @@ REQUIRED_DISCLAIMERS = {
     "neutrality": "Veriqo provides independent informational summaries and is not affiliated with Amazon or any brand."
 }
 
+# Amazon Associates Config
+AMAZON_AFFILIATE_TAG = os.environ.get('AMAZON_AFFILIATE_TAG', 'framouka-20')
+
 # Resend Config
 resend.api_key = os.environ.get('RESEND_API_KEY', '')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
