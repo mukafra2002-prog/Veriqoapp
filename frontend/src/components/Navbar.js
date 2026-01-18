@@ -49,6 +49,12 @@ export const Navbar = () => {
                 Wishlist
               </Button>
             </Link>
+            <Link to="/price-alerts">
+              <Button variant="ghost" className="text-slate-400 hover:text-white hover:bg-white/10">
+                <Bell className="w-4 h-4 mr-2" />
+                Alerts
+              </Button>
+            </Link>
             <Link to="/history">
               <Button variant="ghost" className="text-slate-400 hover:text-white hover:bg-white/10">
                 <History className="w-4 h-4 mr-2" />
